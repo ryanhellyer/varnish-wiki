@@ -1,0 +1,390 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>Step by Step Guide to Making your Drupal Website Fly &mdash; Varnish Wiki  documentation</title>
+	
+
+	
+	
+
+	
+
+	<script type="text/javascript">
+		var DOCUMENTATION_OPTIONS = {
+			URL_ROOT:       './',
+			VERSION:        '1.0',
+			COLLAPSE_INDEX: false,
+			FILE_SUFFIX:    '.html',
+			HAS_SOURCE:     true
+		};
+	</script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/jquery.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/underscore.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/doctools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/searchtools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-fix.js"></script>
+	<link rel="search" title="Search" href="#" />
+	<script type="text/javascript">jQuery(function() { Search.loadIndex("searchindex.js"); });</script>
+	<script type="text/javascript" id="searchindexloader"></script>
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-15491050-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<link rel="stylesheet" href="../../../_static/default.css"/>
+	<link rel="stylesheet" href="../../../_static/custom.css"/>
+
+	<script src="../../../_static/js/popper.min.js"></script>
+	<script src="../../../_static/js/bootstrap.min.js"></script>
+	<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../../../_static/css/custom.css" rel="stylesheet">
+	<link href="../../../_static/css/prism.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="../../../_static/images/favicon.png">
+
+	
+	<script src="../../../_static/js/modernizr.min.js"></script></head>
+<body>
+
+<div class="container">
+	<a href="https://www.varnish-software.com/">
+		<img class="logo" src="../../../_static/images/varnish_software_logo.png" />
+	</a>
+
+	<hr />
+</div>
+<div class="container">
+
+	
+
+	<div id="wiki-sidebar">
+		<div class="sidebar-block">
+			<div class="sidebar-wrapper">
+				<h3>Contents</h3>
+			<div class="sidebar-localtoc">
+				<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../start/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq/index.html">Varnish Web Developer&#8217;s FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../varnish/index.html">How to Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wordpress/index.html">WordPress with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../magento2/index.html">Magento2 with Varnish</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Drupal with Varnish</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Step by Step Guide to Making your Drupal Website Fly</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-varnish">1. Installing Varnish</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-place-drupal-8-behind-varnish">2. How to place Drupal 8 behind Varnish</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#caching">3. Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#excluding-urls">4. Excluding URLS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cookies">5. Cookies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#drupal-caching-headers">6. Drupal Caching Headers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#purging">7. Purging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#restart-services-after-making-changes">8. Restart services after making changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#go-further">9. Go further</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="drupal_vcl.html">Some Sample VCL for Drupal 7 and 8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#implementing-drupal-8-with-varnish">Implementing Drupal 8 with Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#integration">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#our-most-recommended-drupal-modules-for-varnish">Our most Recommended <cite>Drupal Modules</cite> for Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#drupal-resources">Drupal Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../aem.html">Adobe Experience Manager and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../expressionEngine.html">ExpressionEngine and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sitecoreCMS.html">Sitecore CMS and Varnish</a></li>
+</ul>
+
+			</div>
+		</div>
+	</div>
+
+	
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+	
+  <div class="sidebar-block">
+    <div class="sidebar-wrapper">
+      <h4>&nbsp;&nbsp;Contribute</h4>
+      <ul class="this-page-menu">
+        <li><a href="../../../_sources/content/tutorials/drupal/drupal_step_by_step.txt"
+               rel="nofollow">Show Source</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/blob/master/source/content/tutorials/drupal/drupal_step_by_step.rst"
+               rel="nofollow">Show on GitHub</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/edit/master/source/content/tutorials/drupal/drupal_step_by_step.rst"
+               rel="nofollow">Edit on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="wiki-content">
+	
+  <div class="section" id="step-by-step-guide-to-making-your-drupal-website-fly">
+<span id="drupal-step-by-step"></span><h1>Step by Step Guide to Making your Drupal Website Fly<a class="headerlink" href="#step-by-step-guide-to-making-your-drupal-website-fly" title="Permalink to this headline">¶</a></h1>
+<p>Lets go through some of the common steps required to install and configure Varnish
+and integrate it with drupal to take your site to the next level.</p>
+<p>This article assumes that you have a running instance of Magento2 and that you
+have administrator rights for said instance, both at the OS and application level.
+We have tested this using Ubuntu LTS 16.04, Varnish Cache 4.1 and Drupal 8.</p>
+<p>If you still need help Installing Drupal 8 visit the <a class="reference external" href="https://www.drupal.org/8">Drupal-Site</a></p>
+<div class="section" id="installing-varnish">
+<h2>1. Installing Varnish<a class="headerlink" href="#installing-varnish" title="Permalink to this headline">¶</a></h2>
+<p>In case you also donot have Varnish, you will need to follow the instructional
+section on how to <a class="reference internal" href="../varnish/varnish_ubuntu.html"><span class="doc">Install Varnish</span></a>
+before we can continue.</p>
+</div>
+<div class="section" id="how-to-place-drupal-8-behind-varnish">
+<span id="drupal-integration"></span><h2>2. How to place Drupal 8 behind Varnish<a class="headerlink" href="#how-to-place-drupal-8-behind-varnish" title="Permalink to this headline">¶</a></h2>
+<p>So now that you have setup Varnish in-front of your Drupal 8 installation, and
+have apache2 configured, you need to know how to configure Drupal to purge cached
+contents. By default anonymous page caching is enabled.</p>
+<p>To configure caching in Drupal, log in as an administrator on your Drupal site.</p>
+<ul>
+<li><p class="first">Go to the Configuration Menu</p>
+</li>
+<li><p class="first">Click on Performance</p>
+</li>
+<li><dl class="first docutils">
+<dt>Locate Caching and Check both the boxes</dt>
+<dd><p class="first last">x Cache pages for anonymous users (checked by default)
+x Cache blocks</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Set the Minimum cache lifetime; ~ 60min</p>
+</li>
+<li><p class="first">Set Expiration of cached pages; ~ 60min</p>
+</li>
+</ul>
+<p>For Drupal&#8217;s Performance settings go to <cite>/admin/config/development/performance</cite>.</p>
+<p>Set the value for &#8216;Page cache maximum age&#8217; as shown below:</p>
+<a class="reference internal image-reference" href="../../../_images/1-set-page-cache-max-age.png"><img alt="Sphinx Neo-Hittite" class="align-center" src="../../../_images/1-set-page-cache-max-age.png" style="width: 500px;" /></a>
+<p>Always choose caching time considering in mind a better site performance and yet
+cache is not stale for too long. This value will solely depend on the type of site
+you have so good luck making that choice!</p>
+<p>Drupal does two things:</p>
+<ol class="loweralpha">
+<li><dl class="first docutils">
+<dt>It sends the Purge-Cache-Tags header with every request,</dt>
+<dd><p class="first last">containing a space-separated list of all the page&#8217;s cache tags.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>It also sends a BAN request with the appropriate cache tags whenever content</dt>
+<dd><p class="first last">or configuration is updated that should expire pages with the associated
+cache tags.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<p>Both of these can be achieved quickly and easily by enabling and configuring the
+<cite>Purge</cite> and <cite>Generic HTTP Purger</cite> modules. Read about the suggested plugins on
+on our main page.</p>
+<p>Next you need to add a &#8216;purger&#8217; that will send the appropriate BAN requests
+using purge_purger_http: visit the Purge configuration page,
+<cite>admin/config/development/performance/purge</cite>,</p>
+<p>Then follow the steps below as in the image:</p>
+<ol class="lowerroman simple">
+<li>Add a new purger</li>
+</ol>
+<a class="reference internal image-reference" href="../../../_images/2-add-purger.png"><img alt="Sphinx Neo-Hittite" class="align-center" src="../../../_images/2-add-purger.png" style="width: 500px;" /></a>
+<ol class="lowerroman simple" start="2">
+<li>Choose &#8216;HTTP Purger&#8217; and click &#8216;Add&#8217;:</li>
+</ol>
+<a class="reference internal image-reference" href="../../../_images/3-http-purger.png"><img alt="Sphinx Neo-Hittite" class="align-center" src="../../../_images/3-http-purger.png" style="width: 500px;" /></a>
+<p>iii. Configure the Purger&#8217;s name (&#8220;Varnish Purger&#8221;), Type (&#8220;Tag&#8221;), and Request
+settings (defaults for Drupal VM are hostname 127.0.0.1, port 81, path /,
+method BAN, and scheme http):</p>
+<a class="reference internal image-reference" href="../../../_images/4-http-purger-request.png"><img alt="Sphinx Neo-Hittite" class="align-center" src="../../../_images/4-http-purger-request.png" style="width: 500px;" /></a>
+<p>iv. Configure the Purger&#8217;s headers (add one header Purge-Cache-Tags with the
+value [invalidation:expression]):</p>
+<a class="reference internal image-reference" href="../../../_images/5-http-purger-header-cache-tags.png"><img alt="Sphinx Neo-Hittite" class="align-center" src="../../../_images/5-http-purger-header-cache-tags.png" style="width: 500px;" /></a>
+<p>Note from the Original Author: <strong>Don&#8217;t use the header in the screenshot—use Purge-Cache-Tags!</strong></p>
+<p>Images and textual courtesy: <cite>Jeff Geerling&#8217;s Post on Drupal 8 and Varnish</cite></p>
+<ul class="simple">
+<li>Lastly Save the configuration and test that varnish is working.</li>
+<li>Then move on to more advanced stuff; personalized caching is a recommendation.</li>
+</ul>
+<p>This is basic configurtation for Varnish and Drupal, to go more in depth, use vcl
+to write your own customized codes. This wiki contains some templates and examples.</p>
+</div>
+<div class="section" id="caching">
+<h2>3. Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h2>
+<p>Varnish caches everything, so you need to write a rule to exclude what you do not
+want to cache.</p>
+<p>Varnish by default caches to tyeps of requests: GET and HEAD.
+Other requests like DELETE, POST and PUT are never cached. That means you donot
+have to worry about requests that make changes to data, because they are allowed
+to get to the application.</p>
+</div>
+<div class="section" id="excluding-urls">
+<h2>4. Excluding URLS<a class="headerlink" href="#excluding-urls" title="Permalink to this headline">¶</a></h2>
+<p>Pages protected using HTTP Authorization is never cached.
+So for your application specific mechanisms, you need to add a rule like
+the following to ensure that login pages aren&#8217;t cached.</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="c"># exclude drupal login url from caching</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^/status\.php$&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^/update\.php&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^/install\.php&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^/admin&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^/admin/.*$&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^/user&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^/user/.*$&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^/users/.*$&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^/info/.*$&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^/flag/.*$&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^.*/ajax/.*$&quot;</span> <span class="o">||</span>
+     <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;^.*/ahah/.*$&quot;</span><span class="p">)</span> <span class="o">{</span>
+     <span class="k">return</span> <span class="p">(</span><span class="no">pass</span><span class="p">);</span>
+  <span class="o">}</span>
+</pre></div>
+</div>
+<p>if we did end up caching login pages, we could end up serving the same content
+to all the users. That takes us to our next topic, Cookies!</p>
+</div>
+<div class="section" id="cookies">
+<h2>5. Cookies<a class="headerlink" href="#cookies" title="Permalink to this headline">¶</a></h2>
+<p>Cookies are everywhere these days! And we need some of them.
+But they are also one of the most important things in the caching decision.
+Making a choice between which cookies to cache or include is very important for
+a web application.</p>
+<p>Examples such as your site statistics analysis or your website indexing requires
+cookies too. But these are not used by your drupal site at all but if they didn&#8217;t
+exist on your site, your web contents wouldn&#8217;t be indexed for searches. Either way
+these cookies makes your sites content uncacheable and therefore you as the developer
+has to make caching choices very carefully.</p>
+<p>On the other hand, cookies related to page designs and other static contents need
+to be allowed to cache. Below is an example of caching cookies for your drupal site:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="c">#Cookie example</span>
+<span class="c">#Collected from: https://fourkitchens.atlassian.net/wiki/display/TECH/Configure+Varnish+3+for+Drupal+7</span>
+
+<span class="c"># this is an example of Varnish 3, needs to be tested for varnish 4</span>
+
+<span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">req.http.Cookie</span><span class="p">)</span> <span class="o">{</span>
+    <span class="c"># removing these styling and photo cookes from here will allow it to be cached</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;(?i)\.(css|js|jpg|jpeg|gif|png|ico)(\?.*)?$&quot;</span><span class="p">)</span> <span class="o">{</span>
+        <span class="k">unset</span> <span class="nv">req.http.Cookie</span><span class="p">;</span>
+    <span class="o">}</span>
+
+    <span class="k">set</span> <span class="nv">req.http.Cookie</span> <span class="o">=</span> <span class="s">&quot;;&quot;</span> <span class="o">+</span> <span class="nv">req.http.Cookie</span><span class="p">;</span>
+    <span class="k">set</span> <span class="nv">req.http.Cookie</span> <span class="o">=</span> <span class="k">regsuball</span><span class="p">(</span><span class="nv">req.http.Cookie</span><span class="o">,</span> <span class="s">&quot;; +&quot;</span><span class="o">,</span> <span class="s">&quot;;&quot;</span><span class="p">);</span>
+    <span class="k">set</span> <span class="nv">req.http.Cookie</span> <span class="o">=</span> <span class="k">regsuball</span><span class="p">(</span><span class="nv">req.http.Cookie</span><span class="o">,</span> <span class="s">&quot;;(SESS[a-z0-9]+|SSESS[a-z0-9]+|NO_CACHE)=&quot;</span><span class="o">,</span> <span class="s">&quot;; \1=&quot;</span><span class="p">);</span>
+    <span class="k">set</span> <span class="nv">req.http.Cookie</span> <span class="o">=</span> <span class="k">regsuball</span><span class="p">(</span><span class="nv">req.http.Cookie</span><span class="o">,</span> <span class="s">&quot;;[^ ][^;]*&quot;</span><span class="o">,</span> <span class="s">&quot;&quot;</span><span class="p">);</span>
+    <span class="k">set</span> <span class="nv">req.http.Cookie</span> <span class="o">=</span> <span class="k">regsuball</span><span class="p">(</span><span class="nv">req.http.Cookie</span><span class="o">,</span> <span class="s">&quot;^[; ]+|[; ]+$&quot;</span><span class="o">,</span> <span class="s">&quot;&quot;</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">req.http.Cookie</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="o">{</span>
+      <span class="c"># If there are no remaining cookies, remove the cookie header. If there</span>
+      <span class="c"># aren&#39;t any cookie headers, Varnish&#39;s default behavior will be to cache</span>
+      <span class="c"># the page.</span>
+      <span class="k">unset</span> <span class="nv">req.http.Cookie</span><span class="p">;</span>
+    <span class="o">}</span>
+    <span class="k">else</span> <span class="o">{</span>
+      <span class="c"># If there is any cookies left (a session or NO_CACHE cookie), do not</span>
+      <span class="c"># cache the page. Pass it on to Apache directly.</span>
+      <span class="k">return</span> <span class="p">(</span><span class="no">pass</span><span class="p">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c"># removing cookies for static files</span>
+
+<span class="k">sub </span><span class="nf">vcl_backend_response</span><span class="p"> {</span>
+    <span class="c"># Remove cookies for stylesheets, scripts and images used throughout the site.</span>
+    <span class="c"># Removing cookies will allow Varnish to cache those files. It is uncommon for</span>
+    <span class="c"># static files to contain cookies, but it is possible for files generated</span>
+    <span class="c"># dynamically by Drupal. Those cookies are unnecessary, but could prevent files</span>
+    <span class="c"># from being cached.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">bereq.url</span> <span class="o">~</span> <span class="s">&quot;(?i)\.(css|js|jpg|jpeg|gif|png|ico)(\?.*)?$&quot;</span><span class="p">)</span> <span class="o">{</span>
+        <span class="k">unset</span> <span class="nv">beresp.http.set-cookie</span><span class="p">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="drupal-caching-headers">
+<h2>6. Drupal Caching Headers<a class="headerlink" href="#drupal-caching-headers" title="Permalink to this headline">¶</a></h2>
+<p>Drupal sends its own caching information in response headers just like many other
+web applciations. These headers are obviously important to your web application
+and if you configure your varnish to never cache any response, this could destabilize
+your web application. So you need add some configurations to your vcl code that
+will cache your drupal header responses but not cache other headers.</p>
+</div>
+<div class="section" id="purging">
+<h2>7. Purging<a class="headerlink" href="#purging" title="Permalink to this headline">¶</a></h2>
+<p>This bit of code is to allow which IP addresses can access the config files.</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span>acl internal {
+  &quot;192.x.x.x&quot;/24;
+  xxx.xxx.xx.xx;
+}
+# Allowing which address can access cron.php or install.php,
+# add the following in acl.
+</pre></div>
+</div>
+</div>
+<div class="section" id="restart-services-after-making-changes">
+<h2>8. Restart services after making changes<a class="headerlink" href="#restart-services-after-making-changes" title="Permalink to this headline">¶</a></h2>
+<p>Don&#8217;t forget to restart after making changes:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">systemctl</span> <span class="no">restart</span> <span class="n">varnish</span><span class="o">.</span><span class="n">service</span>
+
+<span class="n">sudo</span> <span class="n">systemctl</span> <span class="no">restart</span> <span class="n">apache2</span><span class="o">.</span><span class="n">service</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="go-further">
+<h2>9. Go further<a class="headerlink" href="#go-further" title="Permalink to this headline">¶</a></h2>
+<p>If you are interested in Varnish, you can always give Varnish Plus a go.
+There’s a free trial available. You can capture real-time traffic statistics,
+create a paywall for premium content, simultaneously work on administration
+across all Varnish servers, record relationships between web pages for easy
+content maintenance, detect devices used for browsing, and accelerate APIs.</p>
+</div>
+</div>
+
+
+</div>
+
+<br/>
+
+<div class="container">
+	<div class="footer">
+		<div class="text-muted text-center">
+			<small>Copyright 2018, Varnish Software AB</small>
+		</div>
+		<div class="text-muted text-center">
+			<small>®Varnish Software, Norrtullsgatan 6, 113 29 Stockholm, Organization nr. 556805-6203</small>
+		</div>
+	</div>
+</div>
+
+<script async src="https:////radar.cedexis.com/1/20516/radar.js"></script>
+
+</body>
+</html>

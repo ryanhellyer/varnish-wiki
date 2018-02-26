@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>Step by Step guide to making your Magento 2 Website Fly &mdash; Varnish Wiki  documentation</title>
+	
+
+	
+	
+
+	
+
+	<script type="text/javascript">
+		var DOCUMENTATION_OPTIONS = {
+			URL_ROOT:       './',
+			VERSION:        '1.0',
+			COLLAPSE_INDEX: false,
+			FILE_SUFFIX:    '.html',
+			HAS_SOURCE:     true
+		};
+	</script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/jquery.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/underscore.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/doctools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/searchtools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-fix.js"></script>
+	<link rel="search" title="Search" href="#" />
+	<script type="text/javascript">jQuery(function() { Search.loadIndex("searchindex.js"); });</script>
+	<script type="text/javascript" id="searchindexloader"></script>
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-15491050-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<link rel="stylesheet" href="../../../_static/default.css"/>
+	<link rel="stylesheet" href="../../../_static/custom.css"/>
+
+	<script src="../../../_static/js/popper.min.js"></script>
+	<script src="../../../_static/js/bootstrap.min.js"></script>
+	<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../../../_static/css/custom.css" rel="stylesheet">
+	<link href="../../../_static/css/prism.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="../../../_static/images/favicon.png">
+
+	
+	<script src="../../../_static/js/modernizr.min.js"></script></head>
+<body>
+
+<div class="container">
+	<a href="https://www.varnish-software.com/">
+		<img class="logo" src="../../../_static/images/varnish_software_logo.png" />
+	</a>
+
+	<hr />
+</div>
+<div class="container">
+
+	
+
+	<div id="wiki-sidebar">
+		<div class="sidebar-block">
+			<div class="sidebar-wrapper">
+				<h3>Contents</h3>
+			<div class="sidebar-localtoc">
+				<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../start/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq/index.html">Varnish Web Developer&#8217;s FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../varnish/index.html">How to Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wordpress/index.html">WordPress with Varnish</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Magento2 with Varnish</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="magento2_varnish_basics.html">Understanding Magento 2 and Varnish</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Step by Step guide to making your Magento 2 Website Fly</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-varnish">1. Installing Varnish</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-place-magento-2-behind-varnish">2. How to place Magento 2 behind Varnish</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configuring-magento">Configuring Magento</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#restart-services-after-making-changes">3. Restart services after making changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#basic-caching">4. Basic Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#excluding-certain-urls">5. Excluding certain URLs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extended-caching">6. Extended Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#specific-ttl-based-caching">7. Specific TTL Based Caching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#go-further">8. Go further</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#for-more-guidance">9. For More Guidance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="magento1x.html">Varnish with Magento 1.9 and older</a></li>
+<li class="toctree-l2"><a class="reference internal" href="magento2_vcl.html">Some Sample VCL for Magento2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#implementing-magento-2-with-varnish">Implementing Magento 2 with Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#our-recommneded-plugins-for-magento-2">Our recommneded Plugins for Magento 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#magento-2-resources">Magento 2 Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../drupal/index.html">Drupal with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aem.html">Adobe Experience Manager and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../expressionEngine.html">ExpressionEngine and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sitecoreCMS.html">Sitecore CMS and Varnish</a></li>
+</ul>
+
+			</div>
+		</div>
+	</div>
+
+	
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+	
+  <div class="sidebar-block">
+    <div class="sidebar-wrapper">
+      <h4>&nbsp;&nbsp;Contribute</h4>
+      <ul class="this-page-menu">
+        <li><a href="../../../_sources/content/tutorials/magento2/m2_step_by_step.txt"
+               rel="nofollow">Show Source</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/blob/master/source/content/tutorials/magento2/m2_step_by_step.rst"
+               rel="nofollow">Show on GitHub</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/edit/master/source/content/tutorials/magento2/m2_step_by_step.rst"
+               rel="nofollow">Edit on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="wiki-content">
+	
+  <div class="section" id="step-by-step-guide-to-making-your-magento-2-website-fly">
+<span id="m2-step-by-step"></span><h1>Step by Step guide to making your Magento 2 Website Fly<a class="headerlink" href="#step-by-step-guide-to-making-your-magento-2-website-fly" title="Permalink to this headline">¶</a></h1>
+<p>Magento2 is a PHP-based e-commerce platform.
+They have two editions:</p>
+<ul class="simple">
+<li>Community Edition (CE)</li>
+<li>Enterprise Edition (EE)</li>
+</ul>
+<p>Whichever the case, Ofcourse you want to get started with increasing the performance
+of your website!</p>
+<p>So Lets get Started!</p>
+<p>This article assumes that you have a running instance of Magento2 and that you
+have administrator rights for said instance, both at the OS and application level.
+We have tested this using Ubuntu LTS 16.04, Varnish Cache 4.1 and Magento2.</p>
+<p>If need guidance with the installation of Magento then visit the <a class="reference external" href="http://devdocs.magento.com/guides/v2.1/install-gde/bk-install-guide.html">Magento-Site</a></p>
+<div class="section" id="installing-varnish">
+<h2>1. Installing Varnish<a class="headerlink" href="#installing-varnish" title="Permalink to this headline">¶</a></h2>
+<p>In case you also donot have Varnish, you will need to follow the instructional
+section on how to <a class="reference internal" href="../varnish/varnish_ubuntu.html"><span class="doc">Install Varnish</span></a>
+before we can continue.</p>
+</div>
+<div class="section" id="how-to-place-magento-2-behind-varnish">
+<h2>2. How to place Magento 2 behind Varnish<a class="headerlink" href="#how-to-place-magento-2-behind-varnish" title="Permalink to this headline">¶</a></h2>
+<p>Here we discuss how to configure your Magento2 behind Varnish. The Magento2 Admin
+states that built-in Application cache is not recommended for production use,
+but that does not mean that varnish is configured. Varnish needs to be installed
+and the configuration file suitably configured and deployed.</p>
+<p>We assume that you have Magento2 installed and running on your backend servers
+and that your server is a Debian based Linux Server.</p>
+<div class="section" id="configuring-magento">
+<h3>Configuring Magento<a class="headerlink" href="#configuring-magento" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Visit the Magento 2 Admin page and go to:</p>
+<blockquote>
+<div><p>-&gt; Stores</p>
+<p>-&gt; Advanced</p>
+<p>-&gt; System</p>
+<p>-&gt; Full Page Cache</p>
+</div></blockquote>
+</li>
+</ol>
+<p>Here switch caching application to <strong>Varnish</strong></p>
+<p>This is what the Magento 2 Admin page should look like</p>
+<a class="reference internal image-reference" href="../../../_images/config_varnish_admin.png"><img alt="Sphinx Neo-Hittite" class="align-center" src="../../../_images/config_varnish_admin.png" style="width: 500px;" /></a>
+<p>Image courtesy: <a class="reference external" href="http://devdocs.magento.com/guides/v2.0/config-guide/varnish/config-varnish-magento.html">Magento Site</a></p>
+<ol class="arabic simple" start="2">
+<li>Configuring for Varnish</li>
+</ol>
+<ul class="simple">
+<li>Under the Additional section, find a button for exporting the ready-made configuration file for varnish 3 or 4. We recommned you used varnish 4.0 now.</li>
+</ul>
+<dl class="docutils">
+<dt>Therefore click on::</dt>
+<dd>-&gt; Export VCL for Varnish 4
+this is usually named varnish.vcl</dd>
+</dl>
+<p>Place the file in a varnish folder for configuration (any safe place for you).</p>
+<ul class="simple">
+<li>Next to add varnish repository follow the instructions over at <a class="reference internal" href="../varnish/varnish_ubuntu.html#varnish-ubuntu"><span class="std std-ref">Install Varnish</span></a></li>
+</ul>
+<ol class="arabic simple" start="3">
+<li>Testing your set up</li>
+</ol>
+<p>Now to check if your services are up and running:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>``$ ps -e | grep &#39;apache2|varnish&#39;``
+</pre></div>
+</div>
+<p>If you recieve outputs like the ones below:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>1143 ?        00:00:03 varnishd
+1148 ?        00:00:17 varnishd
+1366 ?        00:02:02 varnishlog
+1591 ?        00:00:01 apache2
+11743 ?       00:00:10 apache2
+11744 ?       00:00:10 apache2
+</pre></div>
+</div>
+<p>Congratulations! You have your services running on the backend.</p>
+<p>Now we need to check the Magento2 frontend::
+As you may have already noticed above, there is a <code class="docutils literal"><span class="pre">varnishlog</span></code> process running as well.</p>
+</div>
+</div>
+<div class="section" id="restart-services-after-making-changes">
+<h2>3. Restart services after making changes<a class="headerlink" href="#restart-services-after-making-changes" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">systemctl</span> <span class="no">restart</span> <span class="n">varnish</span><span class="o">.</span><span class="n">service</span>
+
+<span class="n">sudo</span> <span class="n">systemctl</span> <span class="no">restart</span> <span class="n">apache2</span><span class="o">.</span><span class="n">service</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="basic-caching">
+<h2>4. Basic Caching<a class="headerlink" href="#basic-caching" title="Permalink to this headline">¶</a></h2>
+<p>Varnish doesnot cache cookies or its headers. But some cookies are marked as safe
+by the magento site. Therefore it is recommended to remove or ignore these cookies
+so that varnish can cache anything.</p>
+<p>An example like the following will help to unset/remove unwanted cookies.</p>
+<p>Update your <cite>default.vcl</cite> with this code or a similar code of your choice.</p>
+<p>Under the <cite>vcl_recv</cite> add the following code.</p>
+<p>warning: Make sure to add the code below the default code given for <cite>vcl_recv</cite></p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">req.http.cookie</span><span class="p">)</span> <span class="o">{</span>
+    <span class="k">set</span> <span class="nv">req.http.cookie</span> <span class="o">=</span> <span class="s">&quot;;&quot;</span> <span class="o">+</span> <span class="nv">req.http.cookie</span><span class="p">;</span>
+    <span class="k">set</span> <span class="nv">req.http.cookie</span> <span class="o">=</span> <span class="k">regsuball</span><span class="p">(</span><span class="nv">req.http.cookie</span><span class="o">,</span> <span class="s">&quot;; +&quot;</span><span class="o">,</span> <span class="s">&quot;;&quot;</span><span class="p">);</span>
+    <span class="k">set</span> <span class="nv">req.http.cookie</span> <span class="o">=</span> <span class="k">regsuball</span><span class="p">(</span><span class="nv">req.http.cookie</span><span class="o">,</span> <span class="s">&quot;;(COOKIE1|COOKIE2|COOKIE3)=&quot;</span><span class="o">,</span> <span class="s">&quot;; \1=&quot;</span><span class="p">);</span>
+    <span class="k">set</span> <span class="nv">req.http.cookie</span> <span class="o">=</span> <span class="k">regsuball</span><span class="p">(</span><span class="nv">req.http.cookie</span><span class="o">,</span> <span class="s">&quot;;[^ ][^;]*&quot;</span><span class="o">,</span> <span class="s">&quot;&quot;</span><span class="p">);</span>
+    <span class="k">set</span> <span class="nv">req.http.cookie</span> <span class="o">=</span> <span class="k">regsuball</span><span class="p">(</span><span class="nv">req.http.cookie</span><span class="o">,</span> <span class="s">&quot;^[; ]+|[; ]+$&quot;</span><span class="o">,</span> <span class="s">&quot;&quot;</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">req.http.cookie</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="o">{</span>
+      <span class="n">remove</span> <span class="nv">req.http.cookie</span><span class="p">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="excluding-certain-urls">
+<h2>5. Excluding certain URLs<a class="headerlink" href="#excluding-certain-urls" title="Permalink to this headline">¶</a></h2>
+<p>Not all URLs should be cached. Especially not in sites that deal with personal
+information such as credit card information.</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;magento_admin|magento_login&quot;</span><span class="p">)</span> <span class="o">{</span>
+
+<span class="k">return</span> <span class="p">(</span><span class="no">pass</span><span class="p">);</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="extended-caching">
+<h2>6. Extended Caching<a class="headerlink" href="#extended-caching" title="Permalink to this headline">¶</a></h2>
+<p>There is a subroutine called <em>vcl_fetch</em> which is by default set to 120 seconds
+as can be seen. You can extend this caching value by</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">sub </span><span class="nf">vcl_fetch</span><span class="p"> {</span>
+       <span class="k">set</span> <span class="nv">beresp.ttl</span> <span class="o">=</span> <span class="ld">5s</span><span class="p">;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>This sets the ttl to 5 seconds, thus varnish picks up changes every 5sec.
+Add this subroutine right below the <em>backend default</em>.</p>
+<p>However, there is a downside to short TTL values that is they increase the load
+not only in the backend servers but also the front end servers. Of course this
+gives you a better control over your cache, but it also increases overheads such
+as network traffic, response times becomes slower thus diminishing the whole
+purpose of varnish.</p>
+<p>So decreasing TTL values is not a good solution for high traffic based servers.
+Varnish has a better solution for that.</p>
+</div>
+<div class="section" id="specific-ttl-based-caching">
+<h2>7. Specific TTL Based Caching<a class="headerlink" href="#specific-ttl-based-caching" title="Permalink to this headline">¶</a></h2>
+<p>Varnish creates a TTL value for every object in the cache. A most effective way
+of increasing a websites hit ratio is to increase the time-to-live (ttl) of the
+objects.</p>
+</div>
+<div class="section" id="go-further">
+<h2>8. Go further<a class="headerlink" href="#go-further" title="Permalink to this headline">¶</a></h2>
+<p>If you are interested in Varnish, you can always give Varnish Plus a go.
+There’s a free trial available. You can capture real-time traffic statistics,
+create a paywall for premium content, simultaneously work on administration
+across all Varnish servers, record relationships between web pages for easy
+content maintenance, detect devices used for browsing, and accelerate APIs.</p>
+<p>Check out the links below to take your Varnish-Magento site further.</p>
+</div>
+<div class="section" id="for-more-guidance">
+<h2>9. For More Guidance<a class="headerlink" href="#for-more-guidance" title="Permalink to this headline">¶</a></h2>
+<p>You can always refer to the <a class="reference external" href="http://devdocs.magento.com/guides/v2.0/config~guide/varnish/config~varnish.html">Configure and Use Varnish</a>
+at the Magento site.</p>
+<p>To see the guide on installing and configuring Magento with Varnish on webserver,
+please look at <a class="reference external" href="http://devdocs.magento.com/guides/v2.0/config~guide/varnish/config~varnish~configure.html">here</a>.</p>
+<p>If you are interested in trying out an installation try downloading Marko&#8217;s
+Vagrant Box <a class="reference external" href="https://github.com/Marko-M/magento2-vagrant-nux">marko_magento2github</a>.
+His installation used niginx with varnish and magento.You can also read more
+about that at Marko&#8217;s blogpost about Placing Magento2 behind Varnish <a class="reference external" href="http://www.techytalk.info/magento-2-behind-varnish-reverse-proxy/">marko_magento2post</a>.</p>
+</div>
+</div>
+
+
+</div>
+
+<br/>
+
+<div class="container">
+	<div class="footer">
+		<div class="text-muted text-center">
+			<small>Copyright 2018, Varnish Software AB</small>
+		</div>
+		<div class="text-muted text-center">
+			<small>®Varnish Software, Norrtullsgatan 6, 113 29 Stockholm, Organization nr. 556805-6203</small>
+		</div>
+	</div>
+</div>
+
+<script async src="https:////radar.cedexis.com/1/20516/radar.js"></script>
+
+</body>
+</html>

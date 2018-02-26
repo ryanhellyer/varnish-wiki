@@ -1,0 +1,522 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>Varnish Configuration Language (VCL) &mdash; Varnish Wiki  documentation</title>
+	
+
+	
+	
+
+	
+
+	<script type="text/javascript">
+		var DOCUMENTATION_OPTIONS = {
+			URL_ROOT:       './',
+			VERSION:        '1.0',
+			COLLAPSE_INDEX: false,
+			FILE_SUFFIX:    '.html',
+			HAS_SOURCE:     true
+		};
+	</script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/jquery.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/underscore.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/doctools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/searchtools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-fix.js"></script>
+	<link rel="search" title="Search" href="#" />
+	<script type="text/javascript">jQuery(function() { Search.loadIndex("searchindex.js"); });</script>
+	<script type="text/javascript" id="searchindexloader"></script>
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-15491050-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<link rel="stylesheet" href="../../../_static/default.css"/>
+	<link rel="stylesheet" href="../../../_static/custom.css"/>
+
+	<script src="../../../_static/js/popper.min.js"></script>
+	<script src="../../../_static/js/bootstrap.min.js"></script>
+	<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../../../_static/css/custom.css" rel="stylesheet">
+	<link href="../../../_static/css/prism.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="../../../_static/images/favicon.png">
+
+	
+	<script src="../../../_static/js/modernizr.min.js"></script></head>
+<body>
+
+<div class="container">
+	<a href="https://www.varnish-software.com/">
+		<img class="logo" src="../../../_static/images/varnish_software_logo.png" />
+	</a>
+
+	<hr />
+</div>
+<div class="container">
+
+	
+
+	<div id="wiki-sidebar">
+		<div class="sidebar-block">
+			<div class="sidebar-wrapper">
+				<h3>Contents</h3>
+			<div class="sidebar-localtoc">
+				<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../start/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq/index.html">Varnish Web Developer&#8217;s FAQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">How to Varnish</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="builtin_vcl.html">What&#8217;s in the Builtin VCL?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple_varnishes.html">Dealing with Multiple Varnishes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_varnish.html">Lets Run Varnish!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sample_vclTemplate.html">Sample VCLs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting_varnish.html">Troubleshooting Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnish_ubuntu.html">Installing and Configuring Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnish_test.html">Testing with VarnishTest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnishCacheVersions.html">Which version of Varnish to use?</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Varnish Configuration Language (VCL)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#is-vcl-worth-the-learning-curve">Is VCL worth the learning curve?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-vcl">How to VCL</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-basics">The Basics</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#what-is-built-in-vcl">What is Built-in VCL?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#built-in-subroutines">Built-in Subroutines</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#client-side">Client Side</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#backend-side">Backend Side</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vcl-load-vcl-discard">vcl.load/vcl.discard</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vcl_examples.html">Cache Invalidation with Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#installing-varnish-with-binary-packages"><strong>Installing Varnish with Binary Packages</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#choosing-os">Choosing OS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#compiling-varnish-from-source"><strong>Compiling Varnish from source</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#building-varnish">Building Varnish</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../wordpress/index.html">WordPress with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../magento2/index.html">Magento2 with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../drupal/index.html">Drupal with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aem.html">Adobe Experience Manager and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../expressionEngine.html">ExpressionEngine and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sitecoreCMS.html">Sitecore CMS and Varnish</a></li>
+</ul>
+
+			</div>
+		</div>
+	</div>
+
+	
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+	
+  <div class="sidebar-block">
+    <div class="sidebar-wrapper">
+      <h4>&nbsp;&nbsp;Contribute</h4>
+      <ul class="this-page-menu">
+        <li><a href="../../../_sources/content/tutorials/varnish/vcl.txt"
+               rel="nofollow">Show Source</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/blob/master/source/content/tutorials/varnish/vcl.rst"
+               rel="nofollow">Show on GitHub</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/edit/master/source/content/tutorials/varnish/vcl.rst"
+               rel="nofollow">Edit on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="wiki-content">
+	
+  <div class="section" id="varnish-configuration-language-vcl">
+<span id="vcl"></span><h1>Varnish Configuration Language (VCL)<a class="headerlink" href="#varnish-configuration-language-vcl" title="Permalink to this headline">¶</a></h1>
+<p>One of the key features of Varnish Cache, in addition to its performance, is the
+flexibility of its own configuration language, Varnish Configuration Language
+(VCL).</p>
+<div class="section" id="is-vcl-worth-the-learning-curve">
+<h2>Is VCL worth the learning curve?<a class="headerlink" href="#is-vcl-worth-the-learning-curve" title="Permalink to this headline">¶</a></h2>
+<p>Looking for motivation? Well VCL is easy and very much like C. In fact, VCL accepts
+In-line C, though it is not recommended. Following our guide and learning VCL is the
+way to go! :)</p>
+<p>We consider getting past your fear of coding and learning VCL a good choice
+because writing or modifying VCL can help you understand Varnish better. In fact,
+it will give you the independence to do whatever you want with your Varnish – at
+your own risk, of course! As you already know, many high-profile websites use Varnish,
+and if you are prepared to take your VCL skills to the next level, you will be taking a big step
+in your career.</p>
+</div>
+<div class="section" id="how-to-vcl">
+<h2>How to VCL<a class="headerlink" href="#how-to-vcl" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-basics">
+<h3>The Basics<a class="headerlink" href="#the-basics" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Domain-specific language</li>
+<li>VCL as a finite state machine</li>
+<li>States are sub-routines, e.g. <cite>sub vcl_recv</cite></li>
+<li>Varnish includes built-in subroutines, starting with <cite>vcl_</cite> (reserved prefix)</li>
+<li>Varnish has a built-in VCL that is always appended with your custom VCL
+UNLESS you specify otherwise with a <cite>return (hash)</cite>. This terminates the subroutine,
+and DOES NOT append built-in vcl.</li>
+<li>Available features: <a class="reference external" href="https://www.varnish-cache.org/docs/4.0/reference/vcl.html">functions, legal return actions and variables</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="what-is-built-in-vcl">
+<h2>What is Built-in VCL?<a class="headerlink" href="#what-is-built-in-vcl" title="Permalink to this headline">¶</a></h2>
+<p>The built-in VCL file named <cite>builtin.vcl</cite> is the VCL configuration Varnish
+automatically appends to your VCL file during compilation/loading.</p>
+<p>Whenever a new configuration is loaded, the varnishd management process
+translates the VCL code to C and compiles it to a shared object which is then
+loaded into the server process.</p>
+<p>You can view your <cite>built-in vcl</cite> in this location if you are a debian user:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>cat /usr/share/doc/varnish/builtin.vcl
+</pre></div>
+</div>
+<p><strong>Note:</strong> This <code class="docutils literal"><span class="pre">builtin.vcl</span></code> file is just for Varnish users to see what is
+present in the built-in file. Editing this VCL doesn&#8217;t affect anything.
+Any VCL you want to add goes in the /etc/varnish/default.vcl</p>
+<p>If you want to recreate your own VCL, we recommend you make changes in the
+<cite>example.vcl</cite>. You will find that file in this location if you are a debian user:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>cat /usr/share/doc/varnish/example.vcl
+</pre></div>
+</div>
+</div>
+<div class="section" id="built-in-subroutines">
+<h2>Built-in Subroutines<a class="headerlink" href="#built-in-subroutines" title="Permalink to this headline">¶</a></h2>
+<p>VCL built-in subroutines are the ones that are pre-defined using the syntax
+<cite>vcl_</cite> in the <cite>buildin.vcl</cite> and <cite>default.vcl</cite> (the subroutines here are empty
+by default).</p>
+<p>Here is a simplified version of how the VCL works frontend to backend.
+Click on the image to see a larger, clearer version.</p>
+<a class="reference internal image-reference" href="../../../_images/simplified_fsm.svg"><div align="center" class="align-center"><img alt="Sphinx Neo-Hittite" src="../../../_images/simplified_fsm.svg" width="400px" /></div>
+</a>
+<p>(Collected from the Varnish book)</p>
+<div class="section" id="client-side">
+<h3>Client Side<a class="headerlink" href="#client-side" title="Permalink to this headline">¶</a></h3>
+<p><strong>vcl_recv:</strong></p>
+<ul>
+<li><p class="first">called at the beginning of a request</p>
+</li>
+<li><p class="first">after complete request has been received and parsed</p>
+</li>
+<li><p class="first">after a restart</p>
+</li>
+<li><p class="first">terminates with <cite>return(action)</cite></p>
+</li>
+<li><dl class="first docutils">
+<dt>action types:</dt>
+<dd><ul class="first last simple">
+<li>hash (passes to vcl_hash)</li>
+<li>pass (passes to vcl_pass)</li>
+<li>pipe (passes to vcl_pipe)</li>
+<li>synth (status code, reason):
+synth transition to vcl_synth with resp.status and resp.reason being preset
+to the arguments of synth()</li>
+<li>purge (control passes through vcl_hash to vcl_purge)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_pipe:</strong></p>
+<ul>
+<li><p class="first">called when entering pipe mode</p>
+</li>
+<li><p class="first">this mode passes request to backend</p>
+</li>
+<li><p class="first">terminates with <cite>return(action)</cite></p>
+</li>
+<li><dl class="first docutils">
+<dt>action types:</dt>
+<dd><ul class="first last simple">
+<li>pipe</li>
+<li>synth (status code, reason)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_pass:</strong></p>
+<ul>
+<li><p class="first">called upon entering pass mode</p>
+</li>
+<li><p class="first">the request is passed on to the backend</p>
+</li>
+<li><p class="first">the backend&#8217;s response is passed on to the client</p>
+</li>
+<li><p class="first">but not entered into the cache</p>
+</li>
+<li><p class="first">subsequent requests submitted over the same client connection are
+handled normally</p>
+</li>
+<li><p class="first">terminates with <cite>return(action)</cite></p>
+</li>
+<li><dl class="first docutils">
+<dt>action types:</dt>
+<dd><ul class="first last simple">
+<li>fetch (proceed with pass mode - initiate a backend request)</li>
+<li>restart</li>
+<li>synth (status code, reason)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_hit:</strong></p>
+<ul>
+<li><p class="first">called when a cache look-up is successful</p>
+</li>
+<li><dl class="first docutils">
+<dt>object being hit maybe stale if:</dt>
+<dd><ul class="first last simple">
+<li>it can have a zero, or</li>
+<li>negative ttl with only grace, or</li>
+<li>keep time left</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">terminates with <cite>return(action)</cite></p>
+</li>
+<li><dl class="first docutils">
+<dt>action types:</dt>
+<dd><ul class="first last simple">
+<li>deliver (delivers the object, if stale then background fetch triggered)</li>
+<li>miss (refresh the object and pass to vcl_miss)</li>
+<li>restart</li>
+<li>synth (status code, reason)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_miss:</strong></p>
+<ul>
+<li><p class="first">called after a cache lookup <strong>if</strong> the requested document was not found in cache</p>
+</li>
+<li><p class="first">it decides whether or not to attempt to retrieve the document from the backend</p>
+</li>
+<li><p class="first">terminates with <cite>return(action)</cite></p>
+</li>
+<li><dl class="first docutils">
+<dt>action type:</dt>
+<dd><ul class="first last simple">
+<li>fetch</li>
+<li>pass</li>
+<li>restart</li>
+<li>synth (status code, reason)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_hash:</strong></p>
+<ul>
+<li><p class="first">called after vcl_recv to create a hash value for the request</p>
+</li>
+<li><p class="first">this key is used further to look up the object in cache</p>
+</li>
+<li><dl class="first docutils">
+<dt>terminates only with return(lookup):</dt>
+<dd><ul class="first last simple">
+<li>lookup (looks up the object in cache, passes to whichever subroutine called it)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_purge:</strong></p>
+<ul>
+<li><p class="first">called after the purge has been executed and all its variants have been exited</p>
+</li>
+<li><p class="first">terminates with <cite>return(action)</cite></p>
+</li>
+<li><dl class="first docutils">
+<dt>action type:</dt>
+<dd><ul class="first last simple">
+<li>restart</li>
+<li>synth (status code, reason)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_synth:</strong></p>
+<ul>
+<li><p class="first">called to deliver a synthetic object</p>
+</li>
+<li><p class="first">never enters cache</p>
+</li>
+<li><p class="first">a synthetic object is generated in VCL (NOT fetched from backend)</p>
+</li>
+<li><p class="first">the object&#8217;s body is constructed using the <cite>synthetic()</cite> function</p>
+</li>
+<li><p class="first">terminates with <cite>return(action)</cite></p>
+</li>
+<li><dl class="first docutils">
+<dt>action type:</dt>
+<dd><ul class="first last simple">
+<li>restart</li>
+<li>deliver (delivers to client without calling vcl_deliver)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_deliver:</strong></p>
+<ul>
+<li><p class="first">called before any object is delivered to client (except vcl_synth)</p>
+</li>
+<li><p class="first">terminates with <cite>return(action)</cite></p>
+</li>
+<li><dl class="first docutils">
+<dt>action type:</dt>
+<dd><ul class="first last simple">
+<li>restart</li>
+<li>deliver</li>
+<li>synth(status code, reason)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="backend-side">
+<h3>Backend Side<a class="headerlink" href="#backend-side" title="Permalink to this headline">¶</a></h3>
+<p><strong>vcl_backend_fetch:</strong></p>
+<ul>
+<li><p class="first">called before sending the backend request</p>
+</li>
+<li><p class="first">usually the request is altered here before it gets to the backend</p>
+</li>
+<li><dl class="first docutils">
+<dt>terminates with return(action)</dt>
+<dd><ul class="first last simple">
+<li>fetch</li>
+<li>abandon (abandons request UNLESS the request was a background fetch,
+then it is passed to vcl_synth)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_backened_response:</strong></p>
+<ul>
+<li><p class="first">called after the response headers have been successfully retrieved from backend</p>
+</li>
+<li><dl class="first docutils">
+<dt>terminates with return(action)</dt>
+<dd><ul class="first last simple">
+<li>deliver</li>
+<li>abandon</li>
+<li>retry (increases re-try counter)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_backened_error:</strong></p>
+<ul>
+<li><p class="first">called if backend fetch has failed or if <cite>max_retries</cite> has exceeded</p>
+</li>
+<li><p class="first">sythetic object is generated in VCL using the <cite>synthetic()</cite> function</p>
+</li>
+<li><p class="first">may end up in cache</p>
+</li>
+<li><dl class="first docutils">
+<dt>terminates with return(action)</dt>
+<dd><ul class="first last simple">
+<li>deliver</li>
+<li>retry</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="vcl-load-vcl-discard">
+<h3>vcl.load/vcl.discard<a class="headerlink" href="#vcl-load-vcl-discard" title="Permalink to this headline">¶</a></h3>
+<p><strong>vcl_init:</strong></p>
+<ul>
+<li><p class="first">called when VCL is loaded</p>
+</li>
+<li><p class="first">before any request passes</p>
+</li>
+<li><p class="first">typically called used to initialize VMODs</p>
+</li>
+<li><dl class="first docutils">
+<dt>terminates with return(action)</dt>
+<dd><ul class="first last simple">
+<li>ok</li>
+<li>fail</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>vcl_fini:</strong></p>
+<ul>
+<li><p class="first">called when VCL is discarded, ONLY after ALL request have exited VCL</p>
+</li>
+<li><p class="first">used to clean up VMODs</p>
+</li>
+<li><dl class="first docutils">
+<dt>terminates with return(action)</dt>
+<dd><ul class="first last simple">
+<li>ok (normal return, VCL will be discarded)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>More details <a class="reference external" href="https://www.varnish-cache.org/docs/trunk/users-guide/vcl-built-in-subs.html">subroutines here</a></p>
+</div>
+</div>
+</div>
+
+
+</div>
+
+<br/>
+
+<div class="container">
+	<div class="footer">
+		<div class="text-muted text-center">
+			<small>Copyright 2018, Varnish Software AB</small>
+		</div>
+		<div class="text-muted text-center">
+			<small>®Varnish Software, Norrtullsgatan 6, 113 29 Stockholm, Organization nr. 556805-6203</small>
+		</div>
+	</div>
+</div>
+
+<script async src="https:////radar.cedexis.com/1/20516/radar.js"></script>
+
+</body>
+</html>

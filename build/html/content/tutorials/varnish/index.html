@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>How to Varnish &mdash; Varnish Wiki  documentation</title>
+	
+
+	
+	
+
+	
+
+	<script type="text/javascript">
+		var DOCUMENTATION_OPTIONS = {
+			URL_ROOT:       './',
+			VERSION:        '1.0',
+			COLLAPSE_INDEX: false,
+			FILE_SUFFIX:    '.html',
+			HAS_SOURCE:     true
+		};
+	</script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/jquery.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/underscore.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/doctools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/searchtools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-fix.js"></script>
+	<link rel="search" title="Search" href="#" />
+	<script type="text/javascript">jQuery(function() { Search.loadIndex("searchindex.js"); });</script>
+	<script type="text/javascript" id="searchindexloader"></script>
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-15491050-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<link rel="stylesheet" href="../../../_static/default.css"/>
+	<link rel="stylesheet" href="../../../_static/custom.css"/>
+
+	<script src="../../../_static/js/popper.min.js"></script>
+	<script src="../../../_static/js/bootstrap.min.js"></script>
+	<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../../../_static/css/custom.css" rel="stylesheet">
+	<link href="../../../_static/css/prism.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="../../../_static/images/favicon.png">
+
+	
+	<script src="../../../_static/js/modernizr.min.js"></script></head>
+<body>
+
+<div class="container">
+	<a href="https://www.varnish-software.com/">
+		<img class="logo" src="../../../_static/images/varnish_software_logo.png" />
+	</a>
+
+	<hr />
+</div>
+<div class="container">
+
+	
+
+	<div id="wiki-sidebar">
+		<div class="sidebar-block">
+			<div class="sidebar-wrapper">
+				<h3>Contents</h3>
+			<div class="sidebar-localtoc">
+				<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../start/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq/index.html">Varnish Web Developer&#8217;s FAQ</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to Varnish</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="builtin_vcl.html">What&#8217;s in the Builtin VCL?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple_varnishes.html">Dealing with Multiple Varnishes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_varnish.html">Lets Run Varnish!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sample_vclTemplate.html">Sample VCLs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting_varnish.html">Troubleshooting Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnish_ubuntu.html">Installing and Configuring Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnish_test.html">Testing with VarnishTest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnishCacheVersions.html">Which version of Varnish to use?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcl.html">Varnish Configuration Language (VCL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcl_examples.html">Cache Invalidation with Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-varnish-with-binary-packages"><strong>Installing Varnish with Binary Packages</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#choosing-os">Choosing OS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#freebsd">FreeBSD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#red-hat-centos">Red Hat / CentOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#debian-ubuntu">Debian/Ubuntu</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#compiling-varnish-from-source"><strong>Compiling Varnish from source</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-dependencies-on-debian-ubuntu">Build dependencies on Debian / Ubuntu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-dependencies-on-red-hat-centos">Build dependencies on Red Hat / CentOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-dependencies-on-a-smartos-zone">Build dependencies on a SmartOS Zone</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#building-varnish">Building Varnish</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing">Installing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../wordpress/index.html">WordPress with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../magento2/index.html">Magento2 with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../drupal/index.html">Drupal with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aem.html">Adobe Experience Manager and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../expressionEngine.html">ExpressionEngine and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sitecoreCMS.html">Sitecore CMS and Varnish</a></li>
+</ul>
+
+			</div>
+		</div>
+	</div>
+
+	
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+	
+  <div class="sidebar-block">
+    <div class="sidebar-wrapper">
+      <h4>&nbsp;&nbsp;Contribute</h4>
+      <ul class="this-page-menu">
+        <li><a href="../../../_sources/content/tutorials/varnish/index.txt"
+               rel="nofollow">Show Source</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/blob/master/source/content/tutorials/varnish/index.rst"
+               rel="nofollow">Show on GitHub</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/edit/master/source/content/tutorials/varnish/index.rst"
+               rel="nofollow">Edit on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="wiki-content">
+	
+  <div class="section" id="how-to-varnish">
+<span id="varnish"></span><h1>How to Varnish<a class="headerlink" href="#how-to-varnish" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>Before you get to Varnish, You want to <strong>get varnish</strong>.
+You have two choices:</p>
+<ul class="simple">
+<li>Install <strong>Binary Packages</strong></li>
+<li>Compile It yourself from <strong>source code</strong></li>
+</ul>
+<p>We have packages for a bunch of operating systems and we have the open source
+project available on github.</p>
+<p>If you plan to get Varnish Plus, check out <a class="reference external" href="https://www.varnish-software.com/products/varnish-plus">products at our website</a></p>
+<div class="section" id="installing-varnish-with-binary-packages">
+<h2><strong>Installing Varnish with Binary Packages</strong><a class="headerlink" href="#installing-varnish-with-binary-packages" title="Permalink to this headline">¶</a></h2>
+<p>If you just want to get started with installation on your machine.</p>
+<div class="section" id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
+<p>Your choice of Operating System, preferably UNIX.
+Below we have some helpful commands to get you started for your choice of OS.</p>
+</div>
+</div>
+<div class="section" id="choosing-os">
+<h2>Choosing OS<a class="headerlink" href="#choosing-os" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="freebsd">
+<h3>FreeBSD<a class="headerlink" href="#freebsd" title="Permalink to this headline">¶</a></h3>
+<p>Binary package:</p>
+<p>From source:</p>
+</div>
+<div class="section" id="red-hat-centos">
+<h3>Red Hat / CentOS<a class="headerlink" href="#red-hat-centos" title="Permalink to this headline">¶</a></h3>
+<p>Latest version is available as prebuilt RPMs (el5 and el6) on <a class="reference external" href="https://repo.varnish-cache.org">repo.varnish-cache.org</a> .</p>
+<p>See the online Red Hat installation instructions for more information.</p>
+<p>Varnish is included in the EPEL repository, however due to incompatible syntax
+changes in newer versions of Varnish, only older versions are available.</p>
+<p>We therefore recommend that you install the latest version directly from our
+repository, as described above.</p>
+</div>
+<div class="section" id="debian-ubuntu">
+<h3>Debian/Ubuntu<a class="headerlink" href="#debian-ubuntu" title="Permalink to this headline">¶</a></h3>
+<p>Varnish is distributed with both Debian and Ubuntu.</p>
+<p>Try</p>
+<p>Please note that this might not be the latest version of Varnish.
+If you need a later version of Varnish due the OS version you are using.
+Please follow the instructions in the Varnish Book or as shown below.</p>
+<p>If you are installing Varnish Cache 4.1, replace varnish-4.0 for varnish-4.1 in
+the command above. Instructions for Debian and Ubuntu are the same.</p>
+</div>
+</div>
+<div class="section" id="compiling-varnish-from-source">
+<h2><strong>Compiling Varnish from source</strong><a class="headerlink" href="#compiling-varnish-from-source" title="Permalink to this headline">¶</a></h2>
+<p>If there are no binary packages available for your system,
+or if you want to compile Varnish from source for other reasons such as personal
+interest or anything that counts as reason, follow these steps:</p>
+<p>Download the appropriate release tarball, which you can find on the <a class="reference external" href="http://repo.varnish-cache.org/source/">repository source</a> .</p>
+<p>Alternatively, if you want to hack on Varnish, you should clone our git repository by doing:</p>
+<div class="section" id="id1">
+<h3>Requirements<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>A UNIX Machine or a MAC</p>
+</div>
+<div class="section" id="build-dependencies-on-debian-ubuntu">
+<h3>Build dependencies on Debian / Ubuntu<a class="headerlink" href="#build-dependencies-on-debian-ubuntu" title="Permalink to this headline">¶</a></h3>
+<p>In order to build Varnish from source you need a number of packages installed.
+On a Debian or Ubuntu system these are:</p>
+</div>
+<div class="section" id="build-dependencies-on-red-hat-centos">
+<h3>Build dependencies on Red Hat / CentOS<a class="headerlink" href="#build-dependencies-on-red-hat-centos" title="Permalink to this headline">¶</a></h3>
+<p>To build Varnish on a Red Hat or CentOS system you need the following packages installed:</p>
+</div>
+<div class="section" id="build-dependencies-on-a-smartos-zone">
+<h3>Build dependencies on a SmartOS Zone<a class="headerlink" href="#build-dependencies-on-a-smartos-zone" title="Permalink to this headline">¶</a></h3>
+<p>As of SmartOS pkgsrc 2015Q4, install the following packages:</p>
+<p>Optionally, to pull from a repository:</p>
+</div>
+</div>
+<div class="section" id="building-varnish">
+<h2>Building Varnish<a class="headerlink" href="#building-varnish" title="Permalink to this headline">¶</a></h2>
+<p>Finally if you have all the above <strong>dependencies satisfied</strong>. You can move on to
+building your Varnish from <em>scratch</em>.</p>
+<p>The configure script takes some arguments, but more likely than not you can forget
+about that for now, almost everything in Varnish can be tweaked with run time parameters.</p>
+<p>Before you install, you may want to run the test suite, make a cup of tea while
+it runs, it usually takes a couple of minutes:</p>
+<p><em>Don&#8217;t worry if</em> one or two tests fail, some of the tests are a bit too timing
+sensitive (Please tell us which so we can fix them).</p>
+<p><strong>BUT</strong></p>
+<p>If a <strong>lot of tests fail</strong> and in particular if the <strong>b00000.vtc test fails</strong>,
+something is horribly wrong, and you will get nowhere without figuring out what is causing all the chaos.</p>
+<p>Good Luck!</p>
+<div class="section" id="installing">
+<h3>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h3>
+<p>And finally, the true test of a <strong>brave heart!</strong></p>
+<ul>
+<li><p class="first">Varnish will now be installed in /usr/local.</p>
+</li>
+<li><p class="first">The varnishd binary is in /usr/local/sbin/varnishd.</p>
+</li>
+<li><dl class="first docutils">
+<dt>To make sure that the necessary links and caches of the most recent shared</dt>
+<dd><p class="first last">libraries are found, run</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Using Source: <a class="reference external" href="https://www.varnish-cache.org/docs/trunk/installation/install.html#compiling-varnish-from-source">https://www.varnish-cache.org/docs/trunk/installation/install.html#compiling-varnish-from-source</a></p>
+</div>
+</div>
+</div>
+
+
+</div>
+
+<br/>
+
+<div class="container">
+	<div class="footer">
+		<div class="text-muted text-center">
+			<small>Copyright 2018, Varnish Software AB</small>
+		</div>
+		<div class="text-muted text-center">
+			<small>®Varnish Software, Norrtullsgatan 6, 113 29 Stockholm, Organization nr. 556805-6203</small>
+		</div>
+	</div>
+</div>
+
+<script async src="https:////radar.cedexis.com/1/20516/radar.js"></script>
+
+</body>
+</html>

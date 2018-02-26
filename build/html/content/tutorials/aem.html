@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>Adobe Experience Manager and Varnish &mdash; Varnish Wiki  documentation</title>
+	
+
+	
+	
+
+	
+
+	<script type="text/javascript">
+		var DOCUMENTATION_OPTIONS = {
+			URL_ROOT:       './',
+			VERSION:        '1.0',
+			COLLAPSE_INDEX: false,
+			FILE_SUFFIX:    '.html',
+			HAS_SOURCE:     true
+		};
+	</script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/jquery.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/underscore.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/doctools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/searchtools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-fix.js"></script>
+	<link rel="search" title="Search" href="#" />
+	<script type="text/javascript">jQuery(function() { Search.loadIndex("searchindex.js"); });</script>
+	<script type="text/javascript" id="searchindexloader"></script>
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-15491050-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<link rel="stylesheet" href="../../_static/default.css"/>
+	<link rel="stylesheet" href="../../_static/custom.css"/>
+
+	<script src="../../_static/js/popper.min.js"></script>
+	<script src="../../_static/js/bootstrap.min.js"></script>
+	<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../../_static/css/custom.css" rel="stylesheet">
+	<link href="../../_static/css/prism.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="../../_static/images/favicon.png">
+
+	
+	<script src="../../_static/js/modernizr.min.js"></script></head>
+<body>
+
+<div class="container">
+	<a href="https://www.varnish-software.com/">
+		<img class="logo" src="../../_static/images/varnish_software_logo.png" />
+	</a>
+
+	<hr />
+</div>
+<div class="container">
+
+	
+
+	<div id="wiki-sidebar">
+		<div class="sidebar-block">
+			<div class="sidebar-wrapper">
+				<h3>Contents</h3>
+			<div class="sidebar-localtoc">
+				<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../start/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Varnish Web Developer&#8217;s FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="varnish/index.html">How to Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wordpress/index.html">WordPress with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="magento2/index.html">Magento2 with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drupal/index.html">Drupal with Varnish</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Adobe Experience Manager and Varnish</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-adobe-dispatcher">The Adobe Dispatcher</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dispatcher-limitations">Dispatcher Limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#varnish-cache-plus">Varnish Cache Plus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#replacing-adobe-dispatcher-with-varnish-cache-plus">Replacing Adobe Dispatcher with Varnish Cache Plus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#aem-resources">AEM Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="expressionEngine.html">ExpressionEngine and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sitecoreCMS.html">Sitecore CMS and Varnish</a></li>
+</ul>
+
+			</div>
+		</div>
+	</div>
+
+	
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+	
+  <div class="sidebar-block">
+    <div class="sidebar-wrapper">
+      <h4>&nbsp;&nbsp;Contribute</h4>
+      <ul class="this-page-menu">
+        <li><a href="../../_sources/content/tutorials/aem.txt"
+               rel="nofollow">Show Source</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/blob/master/source/content/tutorials/aem.rst"
+               rel="nofollow">Show on GitHub</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/edit/master/source/content/tutorials/aem.rst"
+               rel="nofollow">Edit on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="wiki-content">
+	
+  <div class="section" id="adobe-experience-manager-and-varnish">
+<span id="aem"></span><h1>Adobe Experience Manager and Varnish<a class="headerlink" href="#adobe-experience-manager-and-varnish" title="Permalink to this headline">¶</a></h1>
+<p>Adobe Experience Manager (AEM) is an enterprise web content management system
+that facilitates organizing, managing, and delivering creative assets. It has
+ready-made templates that users can use to create content and store them securely
+on the cloud.</p>
+<p>Primarily, Adode recommends using the <strong>Adobe Dispatcher</strong> for caching pages. But,
+as well you may know, it is not flexible enough for the cache invalidation techniques
+needed today.</p>
+<div class="section" id="the-adobe-dispatcher">
+<h2>The Adobe Dispatcher<a class="headerlink" href="#the-adobe-dispatcher" title="Permalink to this headline">¶</a></h2>
+<p>It is relatively straight forward.
+It has built-in rules for invalidation.
+These specified rules are not flexible enough.</p>
+<div class="section" id="dispatcher-limitations">
+<h3>Dispatcher Limitations<a class="headerlink" href="#dispatcher-limitations" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Caches documents as delivered in the AEM Instance</li>
+<li><strong>Does NOT cache</strong> HTTP headers (which provide info on handling that content)</li>
+<li>Holds onto the document</li>
+<li><strong>Does NOT</strong> hold onto the accompanying HTTP response</li>
+</ul>
+<p>This is where <strong>VARNISH CACHE PLUS</strong> can help in managing the complex rules
+needed for your site&#8217;s cache invalidation.</p>
+</div>
+</div>
+<div class="section" id="varnish-cache-plus">
+<h2>Varnish Cache Plus<a class="headerlink" href="#varnish-cache-plus" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Cache HTTP headers (requests and responses)</li>
+<li>Configurable to cache any kind of HTTP request using queries</li>
+<li>Cache re-directed responses thus reducing load on the machine</li>
+<li>Querying of requests for content-heavy pages</li>
+<li>ESI</li>
+<li>Customization in flushing</li>
+</ul>
+<p>Vanish Cache is great if you run, for example, a social media, news, banking, or resource data site, among others. Of course, not all the features mentioned above are included in the Varnish community version – that&#8217;s why we have Varnish Cache Plus.</p>
+<p>With Varnish Cache Plus, enhanced Cache Invalidation techniques you might get are:
+- Users to purge content using key-based relationships
+- Scalable cache invalidation (increases cache hit-rate)
+- Exclude certain headers from cache
+- Invalidate page using <em>smart bans</em></p>
+</div>
+<div class="section" id="replacing-adobe-dispatcher-with-varnish-cache-plus">
+<h2>Replacing Adobe Dispatcher with Varnish Cache Plus<a class="headerlink" href="#replacing-adobe-dispatcher-with-varnish-cache-plus" title="Permalink to this headline">¶</a></h2>
+<p>Know  this requires a user to have great understanding of Varnish and its
+language (VCL), AEM and HTTP. As challengin as it may be it is also rewarding
+to see your website fly.</p>
+<p>1. First rule of replacing Dispatcher with Varnish is to ensure that the VCL
+configuration file mimics the behavior of the dispatcher (an Apache module
+making use of CQ-handle headers to invalidate)</p>
+<p>2. Any more site specific knowledge of the website layout can be used to limit
+the trees of invalidation more aggressively.
+More added value included read here <a class="reference external" href="https://info.varnish-software.com/blog/advanced-cache-invalidation-part2">AEM - Cache Invalidation Part 2</a></p>
+<p>3. Doing Bans
+Your setup Preference:</p>
+<ul class="simple">
+<li>you can have Apache, Varnish and AEM on the same machine</li>
+<li>you can have them on different machines and use the Varnish built-in
+SSL/TLS capabilities for handling both the request from the client
+and the backend.</li>
+</ul>
+<p>An example of Excluding backend responses from cache-control</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="c"># Exclude from Cache</span>
+
+<span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+ <span class="k">if</span> <span class="p">(</span><span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;\?&quot;</span> <span class="o">||</span> <span class="nv">req.url</span> <span class="o">~</span> <span class="s">&quot;\/cug_&quot;</span><span class="p">)</span> <span class="o">{</span>
+   <span class="k">return</span><span class="p">(</span><span class="no">pass</span><span class="p">);</span>
+ <span class="o">}</span>
+<span class="o">}</span>
+<span class="k">sub </span><span class="nf">vcl_backend_fetch</span><span class="p"> {</span>
+ <span class="k">if</span> <span class="p">(</span><span class="nv">beresp.http.Dispatcher</span> <span class="o">~</span> <span class="s">&quot;no-cache&quot;</span>
+ <span class="o">||</span> <span class="nv">beresp.http.cache-control</span> <span class="o">~</span> <span class="s">&quot;(no-cache|private)&quot;</span>
+ <span class="o">||</span> <span class="nv">beresp.http.pragma</span> <span class="o">~</span> <span class="s">&quot;no-cache&quot;</span><span class="p">)</span> <span class="o">{</span>
+   <span class="k">set</span> <span class="nv">beresp.ttl</span> <span class="o">=</span> <span class="ld">0s</span><span class="p">;</span>
+ <span class="o">}</span>
+ <span class="k">else</span> <span class="o">{</span>
+   <span class="k">set</span> <span class="nv">beresp.ttl</span> <span class="o">=</span> <span class="ld">4w</span><span class="p">;</span>
+ <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c"># http://www.pro-vision.de/content/dam/pro-vision/production/adaptto/2013/adaptto2013-become-happier-by-using-varnish-cache-stefan-maurer-.pdf/_jcr_content/renditions/original./adaptto2013-become-happier-by-using-varnish-cache-stefan-maurer-.pdf</span>
+</pre></div>
+</div>
+<p>Example of sending all traffic to vdir directory</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span>    <span class="k">set</span> <span class="nv">req.backend_hint</span> <span class="o">=</span> <span class="nf">vdir</span><span class="p">.</span><span class="nf">backend</span><span class="p">();</span> <span class="c"># send all traffic to the vdir director</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="aem-resources">
+<h2>AEM Resources<a class="headerlink" href="#aem-resources" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+</div>
+
+<br/>
+
+<div class="container">
+	<div class="footer">
+		<div class="text-muted text-center">
+			<small>Copyright 2018, Varnish Software AB</small>
+		</div>
+		<div class="text-muted text-center">
+			<small>®Varnish Software, Norrtullsgatan 6, 113 29 Stockholm, Organization nr. 556805-6203</small>
+		</div>
+	</div>
+</div>
+
+<script async src="https:////radar.cedexis.com/1/20516/radar.js"></script>
+
+</body>
+</html>

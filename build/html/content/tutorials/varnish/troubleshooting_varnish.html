@@ -1,0 +1,254 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>Troubleshooting Varnish &mdash; Varnish Wiki  documentation</title>
+	
+
+	
+	
+
+	
+
+	<script type="text/javascript">
+		var DOCUMENTATION_OPTIONS = {
+			URL_ROOT:       './',
+			VERSION:        '1.0',
+			COLLAPSE_INDEX: false,
+			FILE_SUFFIX:    '.html',
+			HAS_SOURCE:     true
+		};
+	</script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/jquery.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/underscore.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/doctools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/searchtools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-fix.js"></script>
+	<link rel="search" title="Search" href="#" />
+	<script type="text/javascript">jQuery(function() { Search.loadIndex("searchindex.js"); });</script>
+	<script type="text/javascript" id="searchindexloader"></script>
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-15491050-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<link rel="stylesheet" href="../../../_static/default.css"/>
+	<link rel="stylesheet" href="../../../_static/custom.css"/>
+
+	<script src="../../../_static/js/popper.min.js"></script>
+	<script src="../../../_static/js/bootstrap.min.js"></script>
+	<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../../../_static/css/custom.css" rel="stylesheet">
+	<link href="../../../_static/css/prism.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="../../../_static/images/favicon.png">
+
+	
+	<script src="../../../_static/js/modernizr.min.js"></script></head>
+<body>
+
+<div class="container">
+	<a href="https://www.varnish-software.com/">
+		<img class="logo" src="../../../_static/images/varnish_software_logo.png" />
+	</a>
+
+	<hr />
+</div>
+<div class="container">
+
+	
+
+	<div id="wiki-sidebar">
+		<div class="sidebar-block">
+			<div class="sidebar-wrapper">
+				<h3>Contents</h3>
+			<div class="sidebar-localtoc">
+				<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../start/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq/index.html">Varnish Web Developer&#8217;s FAQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">How to Varnish</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="builtin_vcl.html">What&#8217;s in the Builtin VCL?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple_varnishes.html">Dealing with Multiple Varnishes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_varnish.html">Lets Run Varnish!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sample_vclTemplate.html">Sample VCLs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Troubleshooting Varnish</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#reload-varnish">Reload varnish</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stop-and-start-varnish">Stop and Start Varnish</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#restart-varnish">Restart Varnish</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#try-to-start-varnish-in-debug-mode">Try to start Varnish in debug mode!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#varnish-is-crashing">Varnish is crashing?</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#panics">panics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#segfaults">segfaults</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#varnish-gives-me-guru-meditation">Varnish gives me Guru Meditation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#varnish-is-not-caching">Varnish is not Caching</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="varnish_ubuntu.html">Installing and Configuring Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnish_test.html">Testing with VarnishTest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnishCacheVersions.html">Which version of Varnish to use?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcl.html">Varnish Configuration Language (VCL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcl_examples.html">Cache Invalidation with Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#installing-varnish-with-binary-packages"><strong>Installing Varnish with Binary Packages</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#choosing-os">Choosing OS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#compiling-varnish-from-source"><strong>Compiling Varnish from source</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#building-varnish">Building Varnish</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../wordpress/index.html">WordPress with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../magento2/index.html">Magento2 with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../drupal/index.html">Drupal with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aem.html">Adobe Experience Manager and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../expressionEngine.html">ExpressionEngine and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sitecoreCMS.html">Sitecore CMS and Varnish</a></li>
+</ul>
+
+			</div>
+		</div>
+	</div>
+
+	
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+	
+  <div class="sidebar-block">
+    <div class="sidebar-wrapper">
+      <h4>&nbsp;&nbsp;Contribute</h4>
+      <ul class="this-page-menu">
+        <li><a href="../../../_sources/content/tutorials/varnish/troubleshooting_varnish.txt"
+               rel="nofollow">Show Source</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/blob/master/source/content/tutorials/varnish/troubleshooting_varnish.rst"
+               rel="nofollow">Show on GitHub</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/edit/master/source/content/tutorials/varnish/troubleshooting_varnish.rst"
+               rel="nofollow">Edit on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="wiki-content">
+	
+  <div class="section" id="troubleshooting-varnish">
+<span id="id1"></span><h1>Troubleshooting Varnish<a class="headerlink" href="#troubleshooting-varnish" title="Permalink to this headline">¶</a></h1>
+<p><strong>Have you tried turning your varnish off and on again?</strong></p>
+<div class="section" id="reload-varnish">
+<h2>Reload varnish<a class="headerlink" href="#reload-varnish" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo systemctl reload varnish.service
+</pre></div>
+</div>
+</div>
+<div class="section" id="stop-and-start-varnish">
+<h2>Stop and Start Varnish<a class="headerlink" href="#stop-and-start-varnish" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo systemctl start varnish.service
+sudo systemctl stop varnish.service
+</pre></div>
+</div>
+</div>
+<div class="section" id="restart-varnish">
+<h2>Restart Varnish<a class="headerlink" href="#restart-varnish" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo systemctl restart varnish.service
+</pre></div>
+</div>
+<p><strong>Still NOT working???</strong></p>
+<div class="section" id="try-to-start-varnish-in-debug-mode">
+<h3>Try to start Varnish in debug mode!<a class="headerlink" href="#try-to-start-varnish-in-debug-mode" title="Permalink to this headline">¶</a></h3>
+<p>For systemv users:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span>varnishd -f /usr/local/etc/varnish/default.vcl -s malloc,1G -T 127.0.0.1: 2000  -a 0.0.0.0:8080 -d
+</pre></div>
+</div>
+<p>For systemd users:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span>varnishd -f /usr/local/etc/varnish/default.vcl -s malloc,1G -T 127.0.0.1: 2000  -a 0.0.0.0:8080 -d
+</pre></div>
+</div>
+</div>
+<div class="section" id="varnish-is-crashing">
+<h3>Varnish is crashing?<a class="headerlink" href="#varnish-is-crashing" title="Permalink to this headline">¶</a></h3>
+<p>IF your varnish is crashing it might be due to a number of reasons.
+Here are a few thigns you can try.</p>
+</div>
+</div>
+<div class="section" id="panics">
+<h2>panics<a class="headerlink" href="#panics" title="Permalink to this headline">¶</a></h2>
+<p>You can inspect any panic messages by typing the following in the CLI:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">panic</span><span class="o">.</span><span class="n">show</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="segfaults">
+<h2>segfaults<a class="headerlink" href="#segfaults" title="Permalink to this headline">¶</a></h2>
+<p>This is a varnish segmentation error. When this happens with the child process
+it is logged, the core is dumped and the child process starts up again.</p>
+<p>If you need help solving your segfaults issue and can log onto our IRC channel
+#varnish and get help or if have a subscription, please call us and we will help
+you fix it.</p>
+<div class="section" id="varnish-gives-me-guru-meditation">
+<h3>Varnish gives me Guru Meditation<a class="headerlink" href="#varnish-gives-me-guru-meditation" title="Permalink to this headline">¶</a></h3>
+<p>To solve a issue like this, checkout varnishhlog.</p>
+<p>You can set varnishlog to log all your 503 errors by issuing the following command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ varnishlog -q <span class="s1">&#39;RespStatus == 503&#39;</span> -g request
+</pre></div>
+</div>
+<p>If the error happened just a short time ago the transaction might still be in
+the shared memory log segment. To get varnishlog to process the whole shared
+memory log just add the &#8216;-d&#8217; parameter:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ varnishlog -d -q <span class="s1">&#39;RespStatus == 503&#39;</span> -g request
+</pre></div>
+</div>
+</div>
+<div class="section" id="varnish-is-not-caching">
+<h3>Varnish is not Caching<a class="headerlink" href="#varnish-is-not-caching" title="Permalink to this headline">¶</a></h3>
+<p>If your varnish is not caching you can follow our simple steps to receive high hit-rate or
+follow the detailed <a class="reference external" href="https://www.varnish-cache.org/docs/4.1/users-guide/increasing-your-hitrate.html#users-guide-increasing-your-hitrate">User Guide</a></p>
+<p>For details on troubleshooting varnish, look at the user guide
+<a class="reference external" href="https://www.varnish-cache.org/docs/4.1/users-guide/troubleshooting.html#users-trouble">Troubleshooting Varnish Section</a></p>
+</div>
+</div>
+</div>
+
+
+</div>
+
+<br/>
+
+<div class="container">
+	<div class="footer">
+		<div class="text-muted text-center">
+			<small>Copyright 2018, Varnish Software AB</small>
+		</div>
+		<div class="text-muted text-center">
+			<small>®Varnish Software, Norrtullsgatan 6, 113 29 Stockholm, Organization nr. 556805-6203</small>
+		</div>
+	</div>
+</div>
+
+<script async src="https:////radar.cedexis.com/1/20516/radar.js"></script>
+
+</body>
+</html>

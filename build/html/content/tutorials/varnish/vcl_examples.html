@@ -1,0 +1,507 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>Cache Invalidation with Examples &mdash; Varnish Wiki  documentation</title>
+	
+
+	
+	
+
+	
+
+	<script type="text/javascript">
+		var DOCUMENTATION_OPTIONS = {
+			URL_ROOT:       './',
+			VERSION:        '1.0',
+			COLLAPSE_INDEX: false,
+			FILE_SUFFIX:    '.html',
+			HAS_SOURCE:     true
+		};
+	</script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/jquery.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/underscore.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/doctools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/searchtools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-fix.js"></script>
+	<link rel="search" title="Search" href="#" />
+	<script type="text/javascript">jQuery(function() { Search.loadIndex("searchindex.js"); });</script>
+	<script type="text/javascript" id="searchindexloader"></script>
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-15491050-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<link rel="stylesheet" href="../../../_static/default.css"/>
+	<link rel="stylesheet" href="../../../_static/custom.css"/>
+
+	<script src="../../../_static/js/popper.min.js"></script>
+	<script src="../../../_static/js/bootstrap.min.js"></script>
+	<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../../../_static/css/custom.css" rel="stylesheet">
+	<link href="../../../_static/css/prism.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="../../../_static/images/favicon.png">
+
+	
+	<script src="../../../_static/js/modernizr.min.js"></script></head>
+<body>
+
+<div class="container">
+	<a href="https://www.varnish-software.com/">
+		<img class="logo" src="../../../_static/images/varnish_software_logo.png" />
+	</a>
+
+	<hr />
+</div>
+<div class="container">
+
+	
+
+	<div id="wiki-sidebar">
+		<div class="sidebar-block">
+			<div class="sidebar-wrapper">
+				<h3>Contents</h3>
+			<div class="sidebar-localtoc">
+				<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../start/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq/index.html">Varnish Web Developer&#8217;s FAQ</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">How to Varnish</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="builtin_vcl.html">What&#8217;s in the Builtin VCL?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple_varnishes.html">Dealing with Multiple Varnishes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_varnish.html">Lets Run Varnish!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sample_vclTemplate.html">Sample VCLs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting_varnish.html">Troubleshooting Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnish_ubuntu.html">Installing and Configuring Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnish_test.html">Testing with VarnishTest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="varnishCacheVersions.html">Which version of Varnish to use?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vcl.html">Varnish Configuration Language (VCL)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Cache Invalidation with Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#http-purge">HTTP Purge</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#purge-an-article-from-the-backend">PURGE an article from the Backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#purge-with-restart">Purge with Restart</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#softpurge">Softpurge</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#purge-call">Purge call</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#purge-call-to-x-headers">Purge call to X-Headers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#banning">Banning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lurker-friendly-bans">Lurker Friendly Bans</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#purge-and-ban-together-example">Purge and Ban Together Example</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#force-cache-miss">Force cache Miss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hashtwo">HASHTWO</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#installing-varnish-with-binary-packages"><strong>Installing Varnish with Binary Packages</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#choosing-os">Choosing OS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#compiling-varnish-from-source"><strong>Compiling Varnish from source</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#building-varnish">Building Varnish</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../wordpress/index.html">WordPress with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../magento2/index.html">Magento2 with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../drupal/index.html">Drupal with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aem.html">Adobe Experience Manager and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../expressionEngine.html">ExpressionEngine and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sitecoreCMS.html">Sitecore CMS and Varnish</a></li>
+</ul>
+
+			</div>
+		</div>
+	</div>
+
+	
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+	
+  <div class="sidebar-block">
+    <div class="sidebar-wrapper">
+      <h4>&nbsp;&nbsp;Contribute</h4>
+      <ul class="this-page-menu">
+        <li><a href="../../../_sources/content/tutorials/varnish/vcl_examples.txt"
+               rel="nofollow">Show Source</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/blob/master/source/content/tutorials/varnish/vcl_examples.rst"
+               rel="nofollow">Show on GitHub</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/edit/master/source/content/tutorials/varnish/vcl_examples.rst"
+               rel="nofollow">Edit on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="wiki-content">
+	
+  <div class="section" id="cache-invalidation-with-examples">
+<span id="vcl-examples"></span><h1>Cache Invalidation with Examples<a class="headerlink" href="#cache-invalidation-with-examples" title="Permalink to this headline">¶</a></h1>
+<p>Here we will explain with example how the different components of Cache
+Invalidation works,</p>
+<div class="section" id="http-purge">
+<h2>HTTP Purge<a class="headerlink" href="#http-purge" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">acl </span><span class="vg">purge </span><span class="p">{</span>
+        <span class="s">&quot;localhost&quot;</span><span class="p">;</span>
+        <span class="s">&quot;x.x.x.x&quot;</span><span class="o">/</span><span class="m">24</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+        <span class="c"># this code below allows PURGE from localhost and x.x.x.x</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">req.method</span> <span class="o">==</span> <span class="s">&quot;PURGE&quot;</span><span class="p">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">client.ip</span> <span class="o">~</span> <span class="no">purge</span><span class="p">)</span> <span class="o">{</span>
+                        <span class="k">return</span><span class="p">(</span><span class="no">synth</span><span class="p">(</span><span class="m">405</span><span class="o">,</span><span class="s">&quot;Not allowed.&quot;</span><span class="p">));</span>
+                <span class="o">}</span>
+                <span class="k">return</span> <span class="p">(</span><span class="no">purge</span><span class="p">);</span>
+        <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c"># Notice the return (purge) this means that this subroutine will end here and</span>
+<span class="c"># jump to the next sub routine vcl_hash without appending to the built-in vcl_recv</span>
+<span class="c"># To read more on this go to https://www.varnish-cache.org/docs/trunk/users-guide/purging.html</span>
+</pre></div>
+</div>
+<div class="section" id="purge-an-article-from-the-backend">
+<h3>PURGE an article from the Backend<a class="headerlink" href="#purge-an-article-from-the-backend" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">acl </span><span class="vg">purge </span><span class="p">{</span>
+        <span class="s">&quot;localhost&quot;</span><span class="p">;</span>
+        <span class="s">&quot;x.x.x.x&quot;</span><span class="o">/</span><span class="m">24</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+        <span class="c"># this code below allows PURGE from localhost and x.x.x.x</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">req.method</span> <span class="o">==</span> <span class="s">&quot;PURGE&quot;</span><span class="p">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">client.ip</span> <span class="o">~</span> <span class="no">purge</span><span class="p">)</span> <span class="o">{</span>
+                        <span class="k">return</span><span class="p">(</span><span class="no">synth</span><span class="p">(</span><span class="m">405</span><span class="o">,</span><span class="s">&quot;Not allowed.&quot;</span><span class="p">));</span>
+                <span class="o">}</span>
+                <span class="k">return</span> <span class="p">(</span><span class="no">purge</span><span class="p">);</span>
+        <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c"># Notice the return (purge) this means that this subroutine will end here and</span>
+<span class="c"># jump to the next sub routine vcl_hash without appending to the built-in vcl_recv</span>
+<span class="c"># To read more on this go to https://www.varnish-cache.org/docs/trunk/users-guide/purging.html</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="purge-with-restart">
+<h3>Purge with Restart<a class="headerlink" href="#purge-with-restart" title="Permalink to this headline">¶</a></h3>
+<p>This allows Varnish to re-run the VCL state machine with different variables.</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">acl </span><span class="vg">purgers </span><span class="p">{</span>
+    <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
+    <span class="s">&quot;192.168.0.0&quot;</span><span class="o">/</span><span class="m">24</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+    <span class="c"># allow PURGE from localhost and 192.168.0...</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">req.restarts</span> <span class="o">==</span> <span class="m">0</span><span class="p">)</span> <span class="o">{</span>
+        <span class="k">unset</span> <span class="nv">req.http.X-Purger</span><span class="p">;</span>
+    <span class="o">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">req.method</span> <span class="o">==</span> <span class="s">&quot;PURGE&quot;</span><span class="p">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">client.ip</span> <span class="o">~</span> <span class="n">purgers</span><span class="p">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="no">synth</span><span class="p">(</span><span class="m">405</span><span class="o">,</span> <span class="s">&quot;Purging not allowed for &quot;</span> <span class="o">+</span> <span class="nv">client.ip</span><span class="p">));</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="no">purge</span><span class="p">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_purge</span><span class="p"> {</span>
+    <span class="k">set</span> <span class="nv">req.method</span> <span class="o">=</span> <span class="s">&quot;GET&quot;</span><span class="p">;</span>
+    <span class="k">set</span> <span class="nv">req.http.X-Purger</span> <span class="o">=</span> <span class="s">&quot;Purged&quot;</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="no">restart</span><span class="p">);</span>
+<span class="o">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_deliver</span><span class="p"> {</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">req.http.X-Purger</span><span class="p">)</span> <span class="o">{</span>
+        <span class="k">set</span> <span class="nv">resp.http.X-Purger</span> <span class="o">=</span> <span class="nv">req.http.X-Purger</span><span class="p">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Source: <a class="reference external" href="http://book.varnish-software.com/4.0/chapters/Cache_Invalidation.html?highlight=vcl_recv">http://book.varnish-software.com/4.0/chapters/Cache_Invalidation.html?highlight=vcl_recv</a></p>
+<p>Collected: 17th August 2016</p>
+</div>
+</div>
+<div class="section" id="softpurge">
+<h2>Softpurge<a class="headerlink" href="#softpurge" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Reduces TTL to 0</li>
+<li>Allows varnish to serve stale objects</li>
+</ul>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">sub </span><span class="nf">vcl_hit</span><span class="p"> {</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">req.method</span> <span class="o">==</span> <span class="s">&quot;PURGE&quot;</span><span class="p">)</span> <span class="o">{</span>
+        <span class="nf">softpurge</span><span class="p">.</span><span class="nf">softpurge</span><span class="p">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>source: <a class="reference external" href="https://github.com/varnish/varnish-modules/blob/master/docs/vmod_softpurge.rst">https://github.com/varnish/varnish-modules/blob/master/docs/vmod_softpurge.rst</a></p>
+<p>Collected: 17th August 2016</p>
+<div class="section" id="purge-call">
+<h3>Purge call<a class="headerlink" href="#purge-call" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="purge-call-to-x-headers">
+<h3>Purge call to X-Headers<a class="headerlink" href="#purge-call-to-x-headers" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="banning">
+<h2>Banning<a class="headerlink" href="#banning" title="Permalink to this headline">¶</a></h2>
+<p>Examples in the varnishadm command line interface:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">ban</span> <span class="nv">req.url</span> <span class="o">~</span> <span class="o">/</span><span class="n">foo</span>
+<span class="k">ban</span> <span class="nv">req.http.host</span> <span class="o">~</span> <span class="n">example</span><span class="o">.</span><span class="n">com</span> <span class="o">&amp;&amp;</span> <span class="nv">obj.http.content-type</span> <span class="o">~</span> <span class="n">text</span>
+<span class="k">ban</span><span class="o">.</span><span class="n">list</span>
+</pre></div>
+</div>
+<p>Example in VCL:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">ban</span><span class="p">(</span><span class="s">&quot;req.url ~ /foo&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Example of VCL code to act on HTTP BAN request method:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">req.method</span> <span class="o">==</span> <span class="s">&quot;BAN&quot;</span><span class="p">)</span> <span class="o">{</span>
+        <span class="k">ban</span><span class="p">(</span><span class="s">&quot;req.http.host == &quot;</span> <span class="o">+</span> <span class="nv">req.http.host</span> <span class="o">+</span>
+            <span class="s">&quot; &amp;&amp; req.url == &quot;</span> <span class="o">+</span> <span class="nv">req.url</span><span class="p">);</span>
+        <span class="c"># Throw a synthetic page so the request won&#39;t go to the backend.</span>
+        <span class="k">return</span><span class="p">(</span><span class="no">synth</span><span class="p">(</span><span class="m">200</span><span class="o">,</span> <span class="s">&quot;Ban added&quot;</span><span class="p">));</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>source: <a class="reference external" href="http://book.varnish-software.com/4.0/chapters/Cache_Invalidation.html">http://book.varnish-software.com/4.0/chapters/Cache_Invalidation.html</a></p>
+<p>To inspect the current ban-list, issue the ban.list command in the CLI:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span>0xb75096d0 1318329475.377475    10      obj.http.x-url ~ test0
+0xb7509610 1318329470.785875    20C     obj.http.x-url ~ test1
+</pre></div>
+</div>
+<div class="section" id="lurker-friendly-bans">
+<h3>Lurker Friendly Bans<a class="headerlink" href="#lurker-friendly-bans" title="Permalink to this headline">¶</a></h3>
+<p>The following snippet shows an example on how to preserve the context of a client request in the cached object:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">sub </span><span class="nf">vcl_backend_response</span><span class="p"> {</span>
+   <span class="k">set</span> <span class="nv">beresp.http.x-url</span> <span class="o">=</span> <span class="nv">bereq.url</span><span class="p">;</span>
+<span class="o">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_deliver</span><span class="p"> {</span>
+   <span class="c"># The X-Url header is for internal use only</span>
+   <span class="k">unset</span> <span class="nv">resp.http.x-url</span><span class="p">;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Now imagine that you just changed a blog post template that requires all blog
+posts that have been cached. For this you can issue a ban such as:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span>$ varnishadm ban &#39;obj.http.x-url ~ ^/blog&#39;
+</pre></div>
+</div>
+<p>Since it uses a lurker-friendly ban expression, the ban inserted in the ban-list
+will be gradually evaluated against all cached objects until all blog posts are
+invalidated. The snippet below shows how to insert the same expression into the
+ban-list in the vcl_recv subroutine:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+   <span class="k">if</span> <span class="p">(</span><span class="nv">req.method</span> <span class="o">==</span> <span class="s">&quot;BAN&quot;</span><span class="p">)</span> <span class="o">{</span>
+
+   <span class="c"># Assumes the ``X-Ban`` header is a regex,</span>
+      <span class="c"># this might be a bit too simple.</span>
+
+      <span class="k">ban</span><span class="p">(</span><span class="s">&quot;obj.http.x-url ~ &quot;</span> <span class="o">+</span> <span class="nv">req.http.x-ban</span><span class="p">);</span>
+      <span class="k">return</span><span class="p">(</span><span class="no">synth</span><span class="p">(</span><span class="m">200</span><span class="o">,</span> <span class="s">&quot;Ban added&quot;</span><span class="p">));</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="purge-and-ban-together-example">
+<h3>Purge and Ban Together Example<a class="headerlink" href="#purge-and-ban-together-example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">req.method</span> <span class="o">==</span> <span class="s">&quot;PURGE&quot;</span><span class="p">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="p">(</span><span class="no">purge</span><span class="p">);</span>
+  <span class="o">}</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nv">req.method</span> <span class="o">==</span> <span class="s">&quot;BAN&quot;</span><span class="p">)</span> <span class="o">{</span>
+      <span class="k">ban</span><span class="p">(</span><span class="s">&quot;obj.http.x-url ~ &quot;</span> <span class="o">+</span> <span class="nv">req.http.x-ban-url</span> <span class="o">+</span>
+          <span class="s">&quot; &amp;&amp; obj.http.x-host ~ &quot;</span> <span class="o">+</span> <span class="nv">req.http.x-ban-host</span><span class="p">);</span>
+      <span class="k">return</span> <span class="p">(</span><span class="no">synth</span><span class="p">(</span><span class="m">200</span><span class="o">,</span> <span class="s">&quot;Ban added&quot;</span><span class="p">));</span>
+  <span class="o">}</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nv">req.method</span> <span class="o">==</span> <span class="s">&quot;REFRESH&quot;</span><span class="p">)</span> <span class="o">{</span>
+      <span class="k">set</span> <span class="nv">req.method</span> <span class="o">=</span> <span class="s">&quot;GET&quot;</span><span class="p">;</span>
+      <span class="k">set</span> <span class="nv">req.hash_always_miss</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_backend_response</span><span class="p"> {</span>
+  <span class="k">set</span> <span class="nv">beresp.http.x-url</span> <span class="o">=</span> <span class="nv">bereq.url</span><span class="p">;</span>
+  <span class="k">set</span> <span class="nv">beresp.http.x-host</span> <span class="o">=</span> <span class="nv">bereq.http.host</span><span class="p">;</span>
+<span class="o">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_deliver</span><span class="p"> {</span>
+  <span class="c"># We remove resp.http.x-* HTTP header fields,</span>
+  <span class="c"># because the client does not neeed them</span>
+  <span class="k">unset</span> <span class="nv">resp.http.x-url</span><span class="p">;</span>
+  <span class="k">unset</span> <span class="nv">resp.http.x-host</span><span class="p">;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="force-cache-miss">
+<h2>Force cache Miss<a class="headerlink" href="#force-cache-miss" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">sub </span><span class="nf">vc_recv</span><span class="p"> {</span>
+  <span class="k">set</span> <span class="nv">req.hash_always_miss</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Causes Varnish to look the object up in cache, but ignore any copy it finds
+Useful way to do a controlled refresh of a specific object
+If the server is down, the cached object is left untouched
+Depending on the Varnish version, it might leave extra copies in the cache
+Useful to refresh slowly generated content</p>
+<p>source: <a class="reference external" href="http://book.varnish-software.com/4.0/chapters/Appendix_G__Solutions.html#solution-write-a-vcl-program-using-purge-and-ban">http://book.varnish-software.com/4.0/chapters/Appendix_G__Solutions.html#solution-write-a-vcl-program-using-purge-and-ban</a></p>
+</div>
+<div class="section" id="hashtwo">
+<h2>HASHTWO<a class="headerlink" href="#hashtwo" title="Permalink to this headline">¶</a></h2>
+<p>The idea is that you can use any arbitrary string for cache invalidation.
+You can then key your cached objects on, for example, product ID or article ID.
+In this way, when you update the price of a certain product or a specific article,
+you have a key to evict all those objects from the cache.</p>
+<p>On Debian or Ubuntu:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>apt-get install libvmod-hashtwo
+</pre></div>
+</div>
+<p>On Red Hat Enterprise Linux:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>yum install libvmod-hashtwo
+</pre></div>
+</div>
+<p>Finally, you can use this VMOD by importing it in your VCL code:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="n">hashtwo</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>VCL example code for hashtwo:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="n">hashtwo</span><span class="p">;</span>
+
+<span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">req.http.X-HashTwo-Purge</span><span class="p">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nf">hashtwo</span><span class="p">.</span><span class="nf">purge</span><span class="p">(</span><span class="nv">req.http.X-HashTwo-Purge</span><span class="p">)</span> <span class="o">!=</span> <span class="m">0</span><span class="p">)</span> <span class="o">{</span>
+       <span class="k">return</span> <span class="p">(</span><span class="no">purge</span><span class="p">);</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="p">(</span><span class="no">synth</span><span class="p">(</span><span class="m">404</span><span class="o">,</span> <span class="s">&quot;Key not found&quot;</span><span class="p">));</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Normally the backend is responsible for setting these headers.
+If you were to do it in VCL, it will look something like this:</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="k">sub </span><span class="nf">vcl_backend_response</span><span class="p"> {</span>
+  <span class="k">set</span> <span class="nv">beresp.http.X-HashTwo</span> <span class="o">=</span> <span class="s">&quot;secondary_hash_key&quot;</span><span class="p">;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>source: <a class="reference external" href="http://book.varnish-software.com/4.0/chapters/Cache_Invalidation.html">http://book.varnish-software.com/4.0/chapters/Cache_Invalidation.html</a>
+A complete GRACE example
+&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;</p>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span><span class="c"># grace mode</span>
+
+<span class="k">sub </span><span class="nf">vcl_hit</span><span class="p"> {</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">obj.ttl</span> <span class="o">&gt;=</span> <span class="ld">0s</span><span class="p">)</span> <span class="o">{</span>
+        <span class="c"># normal hit</span>
+        <span class="k">return</span> <span class="p">(</span><span class="no">deliver</span><span class="p">);</span>
+    <span class="o">}</span>
+    <span class="c"># We have no fresh fish. Lets look at the stale ones.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nf">std</span><span class="p">.</span><span class="nf">healthy</span><span class="p">(</span><span class="nv">req.backend_hint</span><span class="p">))</span> <span class="o">{</span>
+        <span class="c"># Backend is healthy. Limit age to 10s.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">obj.ttl</span> <span class="o">+</span> <span class="ld">10s</span> <span class="o">&gt;</span> <span class="ld">0s</span><span class="p">)</span> <span class="o">{</span>
+            <span class="k">set</span> <span class="nv">req.http.grace</span> <span class="o">=</span> <span class="s">&quot;normal(limited)&quot;</span><span class="p">;</span>
+            <span class="k">return</span> <span class="p">(</span><span class="no">deliver</span><span class="p">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="c"># No candidate for grace. Fetch a fresh object.</span>
+            <span class="k">return</span><span class="p">(</span><span class="no">fetch</span><span class="p">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="c"># backend is sick - use full grace</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">obj.ttl</span> <span class="o">+</span> <span class="nv">obj.grace</span> <span class="o">&gt;</span> <span class="ld">0s</span><span class="p">)</span> <span class="o">{</span>
+            <span class="k">set</span> <span class="nv">req.http.grace</span> <span class="o">=</span> <span class="s">&quot;full&quot;</span><span class="p">;</span>
+            <span class="k">return</span> <span class="p">(</span><span class="no">deliver</span><span class="p">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="c"># no graced object.</span>
+            <span class="k">return</span> <span class="p">(</span><span class="no">fetch</span><span class="p">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_backend_response</span><span class="p"> {</span>
+    <span class="k">set</span> <span class="nv">beresp.ttl</span> <span class="o">=</span> <span class="ld">10s</span><span class="p">;</span>
+    <span class="k">set</span> <span class="nv">beresp.grace</span> <span class="o">=</span> <span class="ld">1h</span><span class="p">;</span>
+<span class="o">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_recv</span><span class="p"> {</span>
+    <span class="c"># intial state</span>
+    <span class="k">set</span> <span class="nv">req.http.grace</span> <span class="o">=</span> <span class="s">&quot;none&quot;</span><span class="p">;</span>
+<span class="o">}</span>
+
+<span class="k">sub </span><span class="nf">vcl_deliver</span><span class="p"> {</span>
+    <span class="c"># copy to resp so we can tell from the outside.</span>
+    <span class="k">set</span> <span class="nv">resp.http.grace</span> <span class="o">=</span> <span class="nv">req.http.grace</span><span class="p">;</span>
+<span class="o">}</span>
+
+
+
+
+
+
+<span class="c"># source: https://gist.github.com/perbu/93803707dbcdbc345da0</span>
+<span class="c"># blogpost: https://info.varnish-software.com/blog/grace-varnish-4-stale-while-revalidate-semantics-varnish</span>
+</pre></div>
+</div>
+<p>Source: <a class="reference external" href="https://info.varnish-software.com/blog/grace-varnish-4-stale-while-revalidate-semantics-varnish">https://info.varnish-software.com/blog/grace-varnish-4-stale-while-revalidate-semantics-varnish</a></p>
+<p>Collected: 17th August 2016</p>
+<p><strong>ref to examples in vcl</strong></p>
+<p>IDEA: <a class="reference external" href="https://info.varnish-software.com/blog/10-varnish-cache-mistakes-and-how-avoid-them">https://info.varnish-software.com/blog/10-varnish-cache-mistakes-and-how-avoid-them</a></p>
+</div>
+</div>
+
+
+</div>
+
+<br/>
+
+<div class="container">
+	<div class="footer">
+		<div class="text-muted text-center">
+			<small>Copyright 2018, Varnish Software AB</small>
+		</div>
+		<div class="text-muted text-center">
+			<small>®Varnish Software, Norrtullsgatan 6, 113 29 Stockholm, Organization nr. 556805-6203</small>
+		</div>
+	</div>
+</div>
+
+<script async src="https:////radar.cedexis.com/1/20516/radar.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>Drupal with Varnish &mdash; Varnish Wiki  documentation</title>
+	
+
+	
+	
+
+	
+
+	<script type="text/javascript">
+		var DOCUMENTATION_OPTIONS = {
+			URL_ROOT:       './',
+			VERSION:        '1.0',
+			COLLAPSE_INDEX: false,
+			FILE_SUFFIX:    '.html',
+			HAS_SOURCE:     true
+		};
+	</script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/jquery.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/underscore.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/doctools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/searchtools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-fix.js"></script>
+	<link rel="search" title="Search" href="#" />
+	<script type="text/javascript">jQuery(function() { Search.loadIndex("searchindex.js"); });</script>
+	<script type="text/javascript" id="searchindexloader"></script>
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-15491050-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<link rel="stylesheet" href="../../../_static/default.css"/>
+	<link rel="stylesheet" href="../../../_static/custom.css"/>
+
+	<script src="../../../_static/js/popper.min.js"></script>
+	<script src="../../../_static/js/bootstrap.min.js"></script>
+	<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../../../_static/css/custom.css" rel="stylesheet">
+	<link href="../../../_static/css/prism.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="../../../_static/images/favicon.png">
+
+	
+	<script src="../../../_static/js/modernizr.min.js"></script></head>
+<body>
+
+<div class="container">
+	<a href="https://www.varnish-software.com/">
+		<img class="logo" src="../../../_static/images/varnish_software_logo.png" />
+	</a>
+
+	<hr />
+</div>
+<div class="container">
+
+	
+
+	<div id="wiki-sidebar">
+		<div class="sidebar-block">
+			<div class="sidebar-wrapper">
+				<h3>Contents</h3>
+			<div class="sidebar-localtoc">
+				<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../start/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq/index.html">Varnish Web Developer&#8217;s FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../varnish/index.html">How to Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wordpress/index.html">WordPress with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../magento2/index.html">Magento2 with Varnish</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Drupal with Varnish</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="drupal_step_by_step.html">Step by Step Guide to Making your Drupal Website Fly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="drupal_vcl.html">Some Sample VCL for Drupal 7 and 8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementing-drupal-8-with-varnish">Implementing Drupal 8 with Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#integration">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#our-most-recommended-drupal-modules-for-varnish">Our most Recommended <cite>Drupal Modules</cite> for Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#drupal-resources">Drupal Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../aem.html">Adobe Experience Manager and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../expressionEngine.html">ExpressionEngine and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sitecoreCMS.html">Sitecore CMS and Varnish</a></li>
+</ul>
+
+			</div>
+		</div>
+	</div>
+
+	
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+	
+  <div class="sidebar-block">
+    <div class="sidebar-wrapper">
+      <h4>&nbsp;&nbsp;Contribute</h4>
+      <ul class="this-page-menu">
+        <li><a href="../../../_sources/content/tutorials/drupal/index.txt"
+               rel="nofollow">Show Source</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/blob/master/source/content/tutorials/drupal/index.rst"
+               rel="nofollow">Show on GitHub</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/edit/master/source/content/tutorials/drupal/index.rst"
+               rel="nofollow">Edit on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="wiki-content">
+	
+  <div class="section" id="drupal-with-varnish">
+<span id="drupal"></span><h1>Drupal with Varnish<a class="headerlink" href="#drupal-with-varnish" title="Permalink to this headline">¶</a></h1>
+<p>Drupal is an open source Content Managenment System (CMS) written in PHP.</p>
+<p>Varnish will help provide a smoother user interface for all the potentially million
+users who access the site everyday. VArnish will not only accelerate your websites
+performance but will also protect all your drupal websites against hackers and bots.</p>
+<p>The Drupal CMS is by default served simple and plain and is mostly marketed to
+technical developers who use there share of CSS magic to make their website standout.</p>
+<p>Drupal features aswesome responsive themses, blog themse, e-commerce themes etc.</p>
+<p>Drupal is also seo friendly and accounts for about 3% of the websites all over
+the internet, of which many are quite high profile clients.</p>
+<p>Drupal is used by multi-organizations, e-commerce sites, technological companies,
+scientists, celebrities, musicians, etc</p>
+<p>Drupal even has its own caching mechanism and stores data from multiple page
+levels. But yet with all the traffic from potential clients and reckless hackers,
+Varnish can boost your sites performance!</p>
+<p>Is your Drupal website slow? We think that with a little help in your configurations,
+your Drupal site can fly!</p>
+<p>Get Varnish!</p>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="implementing-drupal-8-with-varnish">
+<h2>Implementing Drupal 8 with Varnish<a class="headerlink" href="#implementing-drupal-8-with-varnish" title="Permalink to this headline">¶</a></h2>
+<p>Varnish is easy to set up and use. Since we have an open source project you are
+always welcome to try our community edition and contribute your fare share
+of new libraries, plug-ins and features.</p>
+<p>So where in Drupal will you be using Varnish?</p>
+<p>Drupal being a Content Management System,
+- Stores its contents in a database (mostly a separate independent database with its own mind)
+- All data in a CMS are usually normalized cross databases and servers.
+- The design is completely separate from all its contents.</p>
+<p>Drupal provides, advanced URL Control, custom content types (e-commerce, blogs, tutorials, newspaper etc),
+revision control (same various version of the same page), user management (community, )
+This makes a content management system usable by non technical and technical users.
+It also makes the websites highly scalable!</p>
+<p>To make a highly scalable website more manageable and provide better performance to end users,
+varnish provides a number of services.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>If you are ready and just want to get started with the installation go to:</p>
+<p><a class="reference internal" href="drupal_step_by_step.html#drupal-step-by-step"><span class="std std-ref">Step by step Installation guide to make your website fly!</span></a></p>
+<p>Please note that Drupal 8 supports;</p>
+<p><cite>varnish 3</cite> and <cite>varnish 4</cite>.</p>
+<p>Each new upgrade includes a section about the changes that have been made.</p>
+<p><strong>We strictly recommend that you upgrade to varnish 4 as we no longer provide support for varnish 3.</strong></p>
+<p>To make your life easier, there is a Script:</p>
+<p>VCL Migrator, which can help you upgrade from Varnish 3 to Varnish 4.</p>
+</div>
+<div class="section" id="integration">
+<h2>Integration<a class="headerlink" href="#integration" title="Permalink to this headline">¶</a></h2>
+<p>Once you have your varnish installed and configured, you will want to integrate
+it with your Drupal 8 installation.</p>
+<p>For Drupal&#8217;s Performance settings go to <cite>/admin/config/development/performance</cite>.</p>
+<p>In Drupal 8, anonymous page caching is enabled by default.</p>
+<p>To disable caching, set the &#8220;Page cache maximum age&#8221; to no caching.</p>
+<p>See <a class="reference internal" href="drupal_step_by_step.html#drupal-integration"><span class="std std-ref">How to place Drupal 8 behind Varnish</span></a></p>
+<p>Drupal 8 removed the &#8220;Cache Blocks&#8221; and &#8220;Minimum Cache Lifetime&#8221; settings.</p>
+<p>Block caching is now set through each individual block&#8217;s configuration.
+The master listing of blocks is found at /admin/structure/block.</p>
+</div>
+<div class="section" id="our-most-recommended-drupal-modules-for-varnish">
+<h2>Our most Recommended <cite>Drupal Modules</cite> for Varnish<a class="headerlink" href="#our-most-recommended-drupal-modules-for-varnish" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference external" href="https://www.drupal.org/project/purge_purger_http">Generic HTTP Purger</a></li>
+<li><a class="reference external" href="https://www.drupal.org/project/purge">Purge</a></li>
+</ol>
+<p>Purge automatically sets the http.response.debug_cacheability_headers property
+to true via it&#8217;s purge.services.yml</p>
+</div>
+<div class="section" id="drupal-resources">
+<h2>Drupal Resources<a class="headerlink" href="#drupal-resources" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://www.drupal.org/docs/7/caching-to-improve-performance/varnish-cache">Whole new Drupal-Varnish Configuration</a></p>
+<p><a class="reference external" href="http://www.jeffgeerling.com/blog/2016/use-drupal-8-cache-tags-varnish-and-purge">Jeff Geerling&#8217;s Post on Drupal 8 and Varnish</a></p>
+<p><a class="reference external" href="https://www.drupal.org/docs/7/managing-site-performance-and-scalability/caching-to-improve-performance/caching-overview">Caching Overview from Drupal</a></p>
+<p><a class="reference external" href="https://pantheon.io/docs/drupal-8-cache/">Drupal 8 Cache</a></p>
+<p><a class="reference external" href="https://www.drupal.org/project/varnish">Managing Project with Varnish</a></p>
+<p><a class="reference external" href="https://dev.acquia.com/blog/explaining-varnish-beginners">Varnish for beginners</a></p>
+<p><a class="reference external" href="http://www.wunderkraut.com/blog/caching-with-varnish-drupal-7-and-cache-actions/2012-01-31">Caching with Varnish and Drupal 7</a></p>
+<p><a class="reference external" href="https://fourkitchens.atlassian.net/wiki/display/TECH/Configure+Varnish+3+for+Drupal+7">Configuring Varnish 3 for Drupal 7</a></p>
+</div>
+</div>
+
+
+</div>
+
+<br/>
+
+<div class="container">
+	<div class="footer">
+		<div class="text-muted text-center">
+			<small>Copyright 2018, Varnish Software AB</small>
+		</div>
+		<div class="text-muted text-center">
+			<small>®Varnish Software, Norrtullsgatan 6, 113 29 Stockholm, Organization nr. 556805-6203</small>
+		</div>
+	</div>
+</div>
+
+<script async src="https:////radar.cedexis.com/1/20516/radar.js"></script>
+
+</body>
+</html>

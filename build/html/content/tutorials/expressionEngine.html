@@ -1,0 +1,221 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>ExpressionEngine and Varnish &mdash; Varnish Wiki  documentation</title>
+	
+
+	
+	
+
+	
+
+	<script type="text/javascript">
+		var DOCUMENTATION_OPTIONS = {
+			URL_ROOT:       './',
+			VERSION:        '1.0',
+			COLLAPSE_INDEX: false,
+			FILE_SUFFIX:    '.html',
+			HAS_SOURCE:     true
+		};
+	</script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/jquery.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/underscore.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/doctools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/searchtools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-fix.js"></script>
+	<link rel="search" title="Search" href="#" />
+	<script type="text/javascript">jQuery(function() { Search.loadIndex("searchindex.js"); });</script>
+	<script type="text/javascript" id="searchindexloader"></script>
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-15491050-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<link rel="stylesheet" href="../../_static/default.css"/>
+	<link rel="stylesheet" href="../../_static/custom.css"/>
+
+	<script src="../../_static/js/popper.min.js"></script>
+	<script src="../../_static/js/bootstrap.min.js"></script>
+	<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../../_static/css/custom.css" rel="stylesheet">
+	<link href="../../_static/css/prism.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="../../_static/images/favicon.png">
+
+	
+	<script src="../../_static/js/modernizr.min.js"></script></head>
+<body>
+
+<div class="container">
+	<a href="https://www.varnish-software.com/">
+		<img class="logo" src="../../_static/images/varnish_software_logo.png" />
+	</a>
+
+	<hr />
+</div>
+<div class="container">
+
+	
+
+	<div id="wiki-sidebar">
+		<div class="sidebar-block">
+			<div class="sidebar-wrapper">
+				<h3>Contents</h3>
+			<div class="sidebar-localtoc">
+				<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../start/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Varnish Web Developer&#8217;s FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="varnish/index.html">How to Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wordpress/index.html">WordPress with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="magento2/index.html">Magento2 with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drupal/index.html">Drupal with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aem.html">Adobe Experience Manager and Varnish</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ExpressionEngine and Varnish</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-sample-default-vcl-for-expressionengine">A sample default VCL for ExpressionEngine</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sitecoreCMS.html">Sitecore CMS and Varnish</a></li>
+</ul>
+
+			</div>
+		</div>
+	</div>
+
+	
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+	
+  <div class="sidebar-block">
+    <div class="sidebar-wrapper">
+      <h4>&nbsp;&nbsp;Contribute</h4>
+      <ul class="this-page-menu">
+        <li><a href="../../_sources/content/tutorials/expressionEngine.txt"
+               rel="nofollow">Show Source</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/blob/master/source/content/tutorials/expressionEngine.rst"
+               rel="nofollow">Show on GitHub</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/edit/master/source/content/tutorials/expressionEngine.rst"
+               rel="nofollow">Edit on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="wiki-content">
+	
+  <div class="section" id="expressionengine-and-varnish">
+<span id="expressionengine"></span><h1>ExpressionEngine and Varnish<a class="headerlink" href="#expressionengine-and-varnish" title="Permalink to this headline">¶</a></h1>
+<p>ExpressionEngine is another powerful digital content delivery platform from the
+creator of CodeIgniter (agile, open-source framework).</p>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<p>Overview on Varnish 4 with Expression Engine: <a class="reference external" href="https://rye.agency/blog/using-varnish-with-expressionengine">https://rye.agency/blog/using-varnish-with-expressionengine</a></p>
+<p>Making ExpressionEngine Sites Fly with Varnish: <a class="reference external" href="https://ellislab.com/blog/entry/making-sites-fly-with-varnish">https://ellislab.com/blog/entry/making-sites-fly-with-varnish</a>
+(This post is for Varnish 3 configuration; other than that, it&#8217;s a great explanation to move forward.)</p>
+<p>Controlling the cache using ESI: <a class="reference external" href="https://www.smashingmagazine.com/2015/02/using-edge-side-includes-in-varnish/">https://www.smashingmagazine.com/2015/02/using-edge-side-includes-in-varnish/</a></p>
+<p>Server security issues: <a class="reference external" href="https://ellislab.com/blog/entry/http-host-and-server-name-security-issues">https://ellislab.com/blog/entry/http-host-and-server-name-security-issues</a></p>
+</div>
+<div class="section" id="a-sample-default-vcl-for-expressionengine">
+<h2>A sample default VCL for ExpressionEngine<a class="headerlink" href="#a-sample-default-vcl-for-expressionengine" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-VCL"><div class="highlight"><pre><span></span>vcl 4.0;
+
+backend default {
+  .host = &quot;127.0.0.1&quot;;  # The domain or IP address of your ExpressionEngine Site
+  .port = &quot;8080&quot;;       # The port of your EE site. In production, Varnish should be on port 80, so consider changing your Apache server to port 8080
+  .probe = {
+    .url = &quot;/&quot;;
+    .timeout = 1000ms;
+    .interval = 1s;
+    .window = 10;
+    .threshold = 8;
+    }
+}
+
+sub vcl_recv {
+
+  # Forward client&#39;s IP to backend
+  unset req.http.X-Forwarded-For;
+  set req.http.X-Forwarded-For = client.ip;
+
+  # Set the URI of your system directory
+  # In this example, we assume your admin interface is in &quot;system&quot;, so just ensure it&#39;s right for your setup.
+  if (req.url ~ &quot;^/system/&quot; ||
+    req.url ~ &quot;ACT=&quot; ||
+    req.method == &quot;POST&quot; ||
+    (req.url ~ &quot;member_box&quot; &amp;&amp; req.http.Cookie ~ &quot;exp_sessionid&quot;))
+    {
+      return (pass);
+    }
+
+  unset req.http.Cookie;
+
+    # This is different, read this: https://www.varnish-software.com/blog/grace-varnish-4-stale-while-revalidate-semantics-varnish
+    # set req.grace = 1h;
+
+  return(hash);
+}
+
+sub vcl_backend_response {
+
+    # Enable ESI includes
+  set beresp.do_esi = true;
+
+    # Our cache TTL
+  set beresp.ttl = 1m;
+
+    # set beresp.grace = 1h;
+
+  return(deliver);
+}
+</pre></div>
+</div>
+<p>Source: <a class="reference external" href="https://gist.github.com/andrewfairlie/72f42dcdaacc8faaf1da">https://gist.github.com/andrewfairlie/72f42dcdaacc8faaf1da</a></p>
+<p>Collected: 16th August 2016</p>
+</div>
+</div>
+
+
+</div>
+
+<br/>
+
+<div class="container">
+	<div class="footer">
+		<div class="text-muted text-center">
+			<small>Copyright 2018, Varnish Software AB</small>
+		</div>
+		<div class="text-muted text-center">
+			<small>®Varnish Software, Norrtullsgatan 6, 113 29 Stockholm, Organization nr. 556805-6203</small>
+		</div>
+	</div>
+</div>
+
+<script async src="https:////radar.cedexis.com/1/20516/radar.js"></script>
+
+</body>
+</html>

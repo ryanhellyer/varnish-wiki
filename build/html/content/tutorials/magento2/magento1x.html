@@ -1,0 +1,189 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>Varnish with Magento 1.9 and older &mdash; Varnish Wiki  documentation</title>
+	
+
+	
+	
+
+	
+
+	<script type="text/javascript">
+		var DOCUMENTATION_OPTIONS = {
+			URL_ROOT:       './',
+			VERSION:        '1.0',
+			COLLAPSE_INDEX: false,
+			FILE_SUFFIX:    '.html',
+			HAS_SOURCE:     true
+		};
+	</script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/jquery.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/underscore.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/doctools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/searchtools.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="https://www.varnish-software.com//wiki/_static/js/jquery-fix.js"></script>
+	<link rel="search" title="Search" href="#" />
+	<script type="text/javascript">jQuery(function() { Search.loadIndex("searchindex.js"); });</script>
+	<script type="text/javascript" id="searchindexloader"></script>
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-15491050-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<link rel="stylesheet" href="../../../_static/default.css"/>
+	<link rel="stylesheet" href="../../../_static/custom.css"/>
+
+	<script src="../../../_static/js/popper.min.js"></script>
+	<script src="../../../_static/js/bootstrap.min.js"></script>
+	<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../../../_static/css/custom.css" rel="stylesheet">
+	<link href="../../../_static/css/prism.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="../../../_static/images/favicon.png">
+
+	
+	<script src="../../../_static/js/modernizr.min.js"></script></head>
+<body>
+
+<div class="container">
+	<a href="https://www.varnish-software.com/">
+		<img class="logo" src="../../../_static/images/varnish_software_logo.png" />
+	</a>
+
+	<hr />
+</div>
+<div class="container">
+
+	
+
+	<div id="wiki-sidebar">
+		<div class="sidebar-block">
+			<div class="sidebar-wrapper">
+				<h3>Contents</h3>
+			<div class="sidebar-localtoc">
+				<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../start/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq/index.html">Varnish Web Developer&#8217;s FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../varnish/index.html">How to Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wordpress/index.html">WordPress with Varnish</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Magento2 with Varnish</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="magento2_varnish_basics.html">Understanding Magento 2 and Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="m2_step_by_step.html">Step by Step guide to making your Magento 2 Website Fly</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Varnish with Magento 1.9 and older</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#magento-1-x-step-by-step-guide">Magento 1.x Step by Step Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#magento-1-9-and-older-resources">Magento 1.9 and older Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="magento2_vcl.html">Some Sample VCL for Magento2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#implementing-magento-2-with-varnish">Implementing Magento 2 with Varnish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#our-recommneded-plugins-for-magento-2">Our recommneded Plugins for Magento 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#magento-2-resources">Magento 2 Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../drupal/index.html">Drupal with Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aem.html">Adobe Experience Manager and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../expressionEngine.html">ExpressionEngine and Varnish</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sitecoreCMS.html">Sitecore CMS and Varnish</a></li>
+</ul>
+
+			</div>
+		</div>
+	</div>
+
+	
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+	
+  <div class="sidebar-block">
+    <div class="sidebar-wrapper">
+      <h4>&nbsp;&nbsp;Contribute</h4>
+      <ul class="this-page-menu">
+        <li><a href="../../../_sources/content/tutorials/magento2/magento1x.txt"
+               rel="nofollow">Show Source</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/blob/master/source/content/tutorials/magento2/magento1x.rst"
+               rel="nofollow">Show on GitHub</a></li>
+        <li><a href="https://github.com/huayra/wiki_varnish/edit/master/source/content/tutorials/magento2/magento1x.rst"
+               rel="nofollow">Edit on GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="wiki-content">
+	
+  <div class="section" id="varnish-with-magento-1-9-and-older">
+<span id="magento1x"></span><h1>Varnish with Magento 1.9 and older<a class="headerlink" href="#varnish-with-magento-1-9-and-older" title="Permalink to this headline">¶</a></h1>
+<p>Magento versions 1.9 and earlier didnot have support for varnish out of the box.</p>
+<p>Uptil version 1.9.x Magento provides an extension named <a class="reference external" href="https://www.magentocommerce.com/magento-connect/turpentine-varnish-cache.html">Turpentine</a> which improves
+Magento&#8217;s compatibility with Varnish. Turpentine is a Magento extension that provides
+pre-configured Varnish Configuration (VCL) files which can significantly improve
+the cache hit rate.</p>
+<p>There is a <cite>Github Repo for Magento Turpentine</cite> developed by <cite>Nexcess.net</cite>.</p>
+<p>Quoting from the Magento Commerce site,</p>
+<p>&#8220;Note that while this extension is now considered stable, it is strongly
+recommended that it be tested on a development/staging site before deploying on
+a production site due to the potential need to add custom ESI policies for
+blocks added by other extensions.&#8221;</p>
+<div class="section" id="magento-1-x-step-by-step-guide">
+<h2>Magento 1.x Step by Step Guide<a class="headerlink" href="#magento-1-x-step-by-step-guide" title="Permalink to this headline">¶</a></h2>
+<p>Please Note that Magento 2 at this time is the latest version.
+If you choose to upgrade 2 magento 2 that is a humble choice.</p>
+<p>However if you for whatever reason choose to continue to use Magento 1.x we
+have to admit that magento 1.x with varnish is not supported out of the box but
+there is are plugins that can help your varnish configurations with Magento 1.x.</p>
+</div>
+<div class="section" id="magento-1-9-and-older-resources">
+<h2>Magento 1.9 and older Resources<a class="headerlink" href="#magento-1-9-and-older-resources" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://devdocs.magento.com/guides/m1x/ce19-ee114-home.html">Magento1.9 Official Docs</a></p>
+<p><a class="reference external" href="https://alankent.me/2016/04/26/fastly-and-magento/">Fastly with Magento</a></p>
+<p><a class="reference external" href="https://www.fastly.com/blog/introducing-fastlys-magento-1-extension">Fastly&#8217;s Magento 1 extension</a></p>
+<p><a class="reference external" href="https://www.section.io/docs/magento/">Section IO&#8217;s Docs on Magento</a></p>
+</div>
+</div>
+
+
+</div>
+
+<br/>
+
+<div class="container">
+	<div class="footer">
+		<div class="text-muted text-center">
+			<small>Copyright 2018, Varnish Software AB</small>
+		</div>
+		<div class="text-muted text-center">
+			<small>®Varnish Software, Norrtullsgatan 6, 113 29 Stockholm, Organization nr. 556805-6203</small>
+		</div>
+	</div>
+</div>
+
+<script async src="https:////radar.cedexis.com/1/20516/radar.js"></script>
+
+</body>
+</html>
